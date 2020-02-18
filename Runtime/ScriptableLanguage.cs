@@ -1,0 +1,26 @@
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+namespace WhateverDevs.Localization
+{
+    public class ScriptableLanguage : ScriptableObject
+    {
+        public List<LanguagePair> Language = new List<LanguagePair>();
+
+        public void SetValues(string[] _values, string[] _keys)
+        {
+            for (int i = 0; i < _values.Length; ++i)
+            {
+                LanguagePair pair = new LanguagePair
+                {
+                    Key = _keys[i],
+                    Value = _values[i]
+                };
+
+                Language.Add(pair);
+            }
+        }
+    }
+}
+

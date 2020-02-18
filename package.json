@@ -1,7 +1,11 @@
 {
-  "name": "whateverdevs.localizationpackage",
-  "version": "1.0.0",
-  "displayName": "Localization Package",
+  "name": "whateverdevs.core",
+  "version": "0.0.1",
+  "dependencies": {
+    "whateverdevs.extenject": "9.1.1",
+    "varguiniano.extendededitor": "1.0.0"
+  },
+  "displayName": "Localization",
   "description": "Localization.",
   "unity": "2019.1",
   "author": {

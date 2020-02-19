@@ -25,34 +25,40 @@ namespace WhateverDevs.Localization
         /// <summary>
         /// List of all the languages
         /// </summary>
-        private static List<LanguagePack> _LanguagesPack = new List<LanguagePack>();
+        private List<LanguagePack> _LanguagesPack = new List<LanguagePack>();
 
         /// <summary>
         /// Path where to save the scriptables with the info
         /// </summary>
-        protected static string _LanguagePackDirectory = "ScriptableResources/Languages/";// should be variable??
+        protected string _LanguagePackDirectory = "ScriptableResources/Languages/";
 
         /// <summary>
         /// Flag to know 
         /// </summary>
-        private static bool _LanguagesLoaded = false;
+        private bool _LanguagesLoaded = false;
 
         /// <summary>
         /// CurrentLanguage
         /// </summary>
-        private static eLanguage m_CurrentLanguage = eLanguage.ENG;
+        private eLanguage m_CurrentLanguage = eLanguage.ENG;
         public eLanguage CurrentLanguage => m_CurrentLanguage;
 
         #endregion
 
-
-
         #region Load
 
         /// <summary>
+        /// Init 
+        /// </summary>
+        public void Init()
+        {
+            LoadValues();
+        }
+        
+        /// <summary>
         /// Load all the languages from the scriptables objects
         /// </summary>
-        public void LoadValues()
+        private void LoadValues()
         {
             if (_LanguagesLoaded == false)
             {

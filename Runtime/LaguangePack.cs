@@ -31,7 +31,7 @@ namespace WhateverDevs.Localization
             }
             else
             {
-                Debug.LogError("This key already exist : " + key); //modify to use the logger??
+                Debug.LogError("This key already exist : " + key); //todo modify to use the logger??
                 return false;
             }
         }

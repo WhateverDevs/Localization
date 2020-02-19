@@ -18,37 +18,52 @@ namespace WhateverDevs.Localization
         private static List<List<LanguagePair>> localizationMap;
         
         private static Dictionary<string, string> _loadedSheet = new Dictionary<string, string>();
+
+        private string fileToLoad = "/Scripts/ExcelTest.csv";
+
+        private string destinationPath = "Assets/Resources/ScriptableResources/Languages/";
         
+        [MenuItem ("Tools/Localization/LocalFile")]
+
+        public static void  ShowWindow () 
+        {
+            EditorWindow.GetWindow(typeof(LocalSheetLoader));
+        }
+    
+        void OnGUI () 
+        {
+            GUILayout.Label ("CSV Parser", EditorStyles.boldLabel);
+            fileToLoad = EditorGUILayout.TextField ("Csv file to load", fileToLoad);
+            destinationPath = EditorGUILayout.TextField ("Destination file to load", destinationPath);
+            if (GUILayout.Button("Parse"))
+            {
+                ParseCsvToScriptableLanguages();
+            }
+        }
         
         /// <summary>
-        /// Load Languages
+        /// Parse CSV to scriptable
         /// </summary>
-        /// <returns>IEnumerator</returns>
-        [MenuItem("Tools/Localization/LocalFile")]
-        public static void LoadLanguages()
+        private void ParseCsvToScriptableLanguages()
         {
             localizationMap = new List<List<LanguagePair>>();
-
-            float progress = 0.0f;
-
-            EditorUtility.DisplayProgressBar("Loading languages", "Loading...", progress);
 
             for (int i = 0; i < (int) Localizer.eLanguage.COUNT; ++i)
             {
                 localizationMap.Add(new List<LanguagePair>());
             }
 
-            string allText = System.IO.File.ReadAllText(Application.dataPath+ "/Scripts/ExcelTest.csv");
+            string allText = System.IO.File.ReadAllText(Application.dataPath+ fileToLoad);
             
             ParseLocalizationData(allText);
             
         }
 
         /// <summary>
-        /// Parses the downloaded CSV formatted Google Sheet
+        /// Parses the CSV formatted Sheet
         /// </summary>
-        /// <param name="csvData">The Google Sheet in CSV format</param>
-        private static void ParseLocalizationData(string csvData)
+        /// <param name="csvData">The Sheet in CSV format</param>
+        private void ParseLocalizationData(string csvData)
         {
             List<Dictionary<string, string>> gameParametersData = CsvReader.Read(csvData);
 
@@ -70,29 +85,10 @@ namespace WhateverDevs.Localization
                                 item[x].Key = gameParametersData[i].ElementAt(j).Value;
                             }
                         }
-                        else if (gameParametersData[i].ElementAt(j).Key == "SPA" && z == 0)
+                        else if (gameParametersData[i].ElementAt(j).Key == ((Localizer.eLanguage)z).ToString())
                         {
                             item[z].Value = gameParametersData[i].ElementAt(j).Value;
 
-                            localizationMap[z].Add(item[z]);
-                        }
-                        else if (gameParametersData[i].ElementAt(j).Key == "ENG" && z == 1)
-                        {
-                            item[z].Value = gameParametersData[i].ElementAt(j).Value;
-
-                            localizationMap[z].Add(item[z]);
-                        }
-
-                        else if (gameParametersData[i].ElementAt(j).Key == "FRE" && z == 2)
-                        {
-                            item[z].Value = gameParametersData[i].ElementAt(j).Value;
-    
-                            localizationMap[z].Add(item[z]);
-                        }
-                        else if (gameParametersData[i].ElementAt(j).Key == "GER" && z == 3)
-                        {
-                            item[z].Value = gameParametersData[i].ElementAt(j).Value;
-    
                             localizationMap[z].Add(item[z]);
                         }
                     }
@@ -104,7 +100,7 @@ namespace WhateverDevs.Localization
                 ScriptableLanguage asset = ScriptableObject.CreateInstance<ScriptableLanguage>();
 
                 AssetDatabase.CreateAsset(asset,
-                    "Assets/Resources/ScriptableResources/Languages/" + ((Localizer.eLanguage) i).ToString() + ".asset");
+                    destinationPath + ((Localizer.eLanguage) i).ToString() + ".asset");
 
                 asset.Language = localizationMap[i];
 

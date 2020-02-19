@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace WhateverDevs.Localization
 {
+    /// <summary>
+    /// Scriptabale class to collect all the values for a language
+    /// </summary>
     public class ScriptableLanguage : ScriptableObject
     {
         public List<LanguagePair> Language = new List<LanguagePair>();

@@ -5,7 +5,7 @@ using UnityEditor;
 using WhateverDevs.Localization;
 
 /// <summary>
-/// To support a different format change the ParseSheetData method
+/// Class to load different Google sheets
 /// </summary>
 [ExecuteInEditMode]
 public class GoogleSheetsLoader : EditorWindow
@@ -24,9 +24,9 @@ public class GoogleSheetsLoader : EditorWindow
     private static List<List<LanguagePair>> localizationMap;
 
     // The unique identifier of the google drive file we are using
-    private static string LocalizationDriveID = "10SoOgLwD7ga0iy4bFVFhfw_RCPPugFTW9hM9QBAKy3Q";
+    private static string LocalizationDriveID = "";//"10SoOgLwD7ga0iy4bFVFhfw_RCPPugFTW9hM9QBAKy3Q";
 
-    // Ids de las paginas que vamos a cargar en el proyecto para los idiomas
+    // Id of the spreadsheet pages
     private static string[] LocalizationSheetID = { "0"};
 
     #endregion
@@ -63,12 +63,12 @@ public class GoogleSheetsLoader : EditorWindow
 
             LoadGoogleSheet(LocalizationDriveID, LocalizationSheetID[i]);
 
-            ParsheLocalizationData(serverCall.text);
+            ParseLocalizationData(serverCall.text);
 
-            EditorUtility.DisplayProgressBar("Cargando idiomas", "Cargando...", progress);
+            EditorUtility.DisplayProgressBar("Loading languages", "Loading...", progress);
         }
 
-        EditorUtility.DisplayProgressBar("Cargando idiomas", "Cargando...", 1.0f);
+        EditorUtility.DisplayProgressBar("Loading languages", "Loading...", 1.0f);
         EditorUtility.ClearProgressBar();
     }
 
@@ -100,7 +100,7 @@ public class GoogleSheetsLoader : EditorWindow
     /// Parses the downloaded CSV formatted Google Sheet
     /// </summary>
     /// <param name="csvData">The Google Sheet in CSV format</param>
-    private static void ParsheLocalizationData(string csvData)
+    private static void ParseLocalizationData(string csvData)
     {
         if (string.IsNullOrEmpty(csvData))
         {
@@ -127,30 +127,12 @@ public class GoogleSheetsLoader : EditorWindow
                             item[x].Key = gameParametersData[i].ElementAt(j).Value;
                         }
                     }
-                    else if (gameParametersData[i].ElementAt(j).Key == "SPA" && z == 0)
+                    else if (gameParametersData[i].ElementAt(j).Key == ((Localizer.eLanguage)z).ToString())
                     {
                         item[z].Value = gameParametersData[i].ElementAt(j).Value;
 
                         localizationMap[z].Add(item[z]);
                     }
-                    else if (gameParametersData[i].ElementAt(j).Key == "ENG" && z == 1)
-                    {
-                        item[z].Value = gameParametersData[i].ElementAt(j).Value;
-
-                        localizationMap[z].Add(item[z]);
-                    }
-                    /*else if (gameParametersData[i].ElementAt(j).Key == "FRE" && z == 2)
-                    {
-                        item[z].Value = gameParametersData[i].ElementAt(j).Value;
-
-                        localizationMap[z].Add(item[z]);
-                    }
-                    else if (gameParametersData[i].ElementAt(j).Key == "GER" && z == 3)
-                    {
-                        item[z].Value = gameParametersData[i].ElementAt(j).Value;
-
-                        localizationMap[z].Add(item[z]);
-                    }*/
                 }
             }
         }
@@ -161,7 +143,7 @@ public class GoogleSheetsLoader : EditorWindow
 
             AssetDatabase.CreateAsset(asset, "Assets/Resources/ScriptableResources/Languages/" + ((Localizer.eLanguage)i).ToString() + ".asset");
             
-            //asset.Language = localizationMap[i];
+            asset.Language = localizationMap[i];
 
             EditorUtility.SetDirty(asset);
 

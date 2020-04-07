@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-
 namespace WhateverDevs.Localization
 {
     /// <summary>
@@ -15,7 +14,7 @@ namespace WhateverDevs.Localization
         {
             SPA,
             ENG,
-            FRE, 
+            FRE,
             GER,
             COUNT
         }
@@ -41,6 +40,7 @@ namespace WhateverDevs.Localization
         /// CurrentLanguage
         /// </summary>
         private eLanguage m_CurrentLanguage = eLanguage.ENG;
+
         public eLanguage CurrentLanguage => m_CurrentLanguage;
 
         #endregion
@@ -54,7 +54,7 @@ namespace WhateverDevs.Localization
         {
             LoadValues();
         }
-        
+
         /// <summary>
         /// Load all the languages from the scriptables objects
         /// </summary>
@@ -72,6 +72,7 @@ namespace WhateverDevs.Localization
                     if (tempScript != null)
                     {
                         LanguagePack temp = new LanguagePack();
+
                         for (int j = 0; j < tempScript.Language.Count; ++j)
                         {
                             string key = tempScript.Language[j].Key;
@@ -82,6 +83,7 @@ namespace WhateverDevs.Localization
                         _LanguagesPack.Add(temp);
                     }
                 }
+
                 _LanguagesLoaded = true;
             }
         }
@@ -91,17 +93,11 @@ namespace WhateverDevs.Localization
         /// <summary>
         /// Getting the value for a key in the current language 
         /// </summary>
-        public string GetText(string _key)
-        {
-            if (_LanguagesLoaded)
-            {
-                return _LanguagesPack[(int) m_CurrentLanguage].GetString(_key);
-            }
-            else
-            {
-                return "The languages are not loaded yet!!";
-            }
-        }
+        public string GetText(string _key) =>
+            _LanguagesLoaded
+                ? _LanguagesPack[(int) m_CurrentLanguage].GetString(_key)
+                : "The languages are not loaded yet!!";
+
+        public string this[string key] => GetText(key);
     }
 }
-

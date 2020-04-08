@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
+using WhateverDevs.Core.Runtime.Common;
 
 namespace WhateverDevs.Localization
 {
@@ -18,7 +18,7 @@ namespace WhateverDevs.Localization
     /// Class to collect all the info 
     /// </summary>
     [System.Serializable]
-    public class LanguagePack
+    public class LanguagePack : Loggable<LanguagePack>
     {
         public Dictionary<string, string> strings = new Dictionary<string, string>();
 
@@ -31,7 +31,7 @@ namespace WhateverDevs.Localization
             }
             else
             {
-                Debug.LogError("This key already exist : " + key); //todo modify to use the logger??
+                GetLogger().Error("This key already exist : " + key);
                 return false;
             }
         }
@@ -40,7 +40,7 @@ namespace WhateverDevs.Localization
         /// <summary>
         /// Try to get the value for an specific key
         /// </summary>
-        /// <param name="key">key para obtener el texto en función del idioma</param>
+        /// <param name="key">key to get the localized text</param>
         public string GetString(string key)
         {
             if (strings.ContainsKey(key))
@@ -48,6 +48,7 @@ namespace WhateverDevs.Localization
                 return strings[key];
             }
 
+            GetLogger().Error("Bad key :" + key);
             return "BAD KEY" + key;
         }
     }

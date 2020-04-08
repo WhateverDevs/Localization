@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using WhateverDevs.Core.Runtime.Common;
 
 namespace WhateverDevs.Localization
 {
     /// <summary>
     /// Localizer class
     /// </summary>
-    public class Localizer
+    public class Localizer : Loggable<Localizer>, ILocalizer 
     {
         public enum eLanguage
         {
@@ -93,10 +94,16 @@ namespace WhateverDevs.Localization
         /// <summary>
         /// Getting the value for a key in the current language 
         /// </summary>
-        public string GetText(string _key) =>
-            _LanguagesLoaded
-                ? _LanguagesPack[(int) m_CurrentLanguage].GetString(_key)
-                : "The languages are not loaded yet!!";
+        public string GetText(string _key)
+        {
+            if(_LanguagesLoaded)
+                 return _LanguagesPack[(int) m_CurrentLanguage].GetString(_key);
+            else
+            {
+                GetLogger().Error("The languages are not loaded yet!!");
+                return "The languages are not loaded yet!!";
+            }
+        }
 
         public string this[string key] => GetText(key);
     }

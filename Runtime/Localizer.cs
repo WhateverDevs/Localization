@@ -1,74 +1,62 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
+using WhateverDevs.Localizer.Runtime;
 
 namespace WhateverDevs.Localization
 {
     /// <summary>
-    /// Localizer class
+    ///     Localizer class
     /// </summary>
-    public class Localizer : Loggable<Localizer>, ILocalizer 
+    public class Localizer : Loggable<Localizer>, ILocalizer
     {
-        public enum eLanguage
-        {
-            SPA,
-            ENG,
-            FRE,
-            GER,
-            COUNT
-        }
-
         #region Params
+        /// <summary>
+        /// Configuration
+        /// </summary>
+        protected LocalizerConfiguration configuration;
+        
+        /// <summary>
+        ///     List of all the languages
+        /// </summary>
+        private readonly List<LanguagePack> _LanguagesPack = new List<LanguagePack>();
 
         /// <summary>
-        /// List of all the languages
+        ///     Flag to know
         /// </summary>
-        private List<LanguagePack> _LanguagesPack = new List<LanguagePack>();
+        private bool _LanguagesLoaded;
 
         /// <summary>
-        /// Path where to save the scriptables with the info
+        ///     CurrentLanguage
         /// </summary>
-        protected string _LanguagePackDirectory = "ScriptableResources/Languages/";
+        private int _CurrentLanguage = 0;
 
-        /// <summary>
-        /// Flag to know 
-        /// </summary>
-        private bool _LanguagesLoaded = false;
-
-        /// <summary>
-        /// CurrentLanguage
-        /// </summary>
-        private eLanguage m_CurrentLanguage = eLanguage.ENG;
-
-        public eLanguage CurrentLanguage => m_CurrentLanguage;
+        public int CurrentLanguage => _CurrentLanguage;
 
         #endregion
 
         #region Load
 
         /// <summary>
-        /// Init 
+        ///     Init
         /// </summary>
-        public void Init()
-        {
-            LoadValues();
-        }
+        public void Init() => LoadValues();
 
         /// <summary>
-        /// Load all the languages from the scriptables objects
+        ///     Load all the languages from the scriptables objects
         /// </summary>
         private void LoadValues()
         {
             if (_LanguagesLoaded == false)
             {
-                for (int i = 0; i < (int) eLanguage.COUNT; ++i)
-                {
-                    string auxPath = _LanguagePackDirectory + eLanguage.GetName(typeof(eLanguage), (eLanguage) i);
+                string auxPath = configuration.ConfigurationData.languagePackDirectory;
 
-                    ScriptableLanguage tempScript =
-                        Resources.Load(auxPath, typeof(ScriptableLanguage)) as ScriptableLanguage;
+                object[] tempObject = Resources.LoadAll(auxPath, typeof(ScriptableLanguage));
+
+                for (int i = 0; i < tempObject.Length; ++i)
+                {
+                    ScriptableLanguage tempScript = tempObject[i] as ScriptableLanguage;
 
                     if (tempScript != null)
                     {
@@ -92,17 +80,14 @@ namespace WhateverDevs.Localization
         #endregion
 
         /// <summary>
-        /// Getting the value for a key in the current language 
+        ///     Getting the value for a key in the current language
         /// </summary>
         public string GetText(string _key)
         {
-            if(_LanguagesLoaded)
-                 return _LanguagesPack[(int) m_CurrentLanguage].GetString(_key);
-            else
-            {
-                GetLogger().Error("The languages are not loaded yet!!");
-                return "The languages are not loaded yet!!";
-            }
+            if (_LanguagesLoaded) return _LanguagesPack[_CurrentLanguage].GetString(_key);
+
+            GetLogger().Error("The languages are not loaded yet!!");
+            return "The languages are not loaded yet!!";
         }
 
         public string this[string key] => GetText(key);

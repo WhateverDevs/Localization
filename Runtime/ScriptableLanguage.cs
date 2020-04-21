@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace WhateverDevs.Localization
 {
     /// <summary>
-    /// Scriptabale class to collect all the values for a language
+    ///     Scriptabale class to collect all the values for a language
     /// </summary>
     public class ScriptableLanguage : ScriptableObject
     {
@@ -16,14 +15,13 @@ namespace WhateverDevs.Localization
             for (int i = 0; i < _values.Length; ++i)
             {
                 LanguagePair pair = new LanguagePair
-                {
-                    Key = _keys[i],
-                    Value = _values[i]
-                };
+                                    {
+                                        Key = _keys[i],
+                                        Value = _values[i]
+                                    };
 
                 Language.Add(pair);
             }
         }
     }
 }
-

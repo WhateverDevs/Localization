@@ -19,9 +19,9 @@ namespace WhateverDevs.Localization
 
         private static readonly Dictionary<string, string> _loadedSheet = new Dictionary<string, string>();
 
-        private string fileToLoad = "/Scripts/ExcelTest.csv";
+        private string fileToLoad = "/ExcelTest.csv";
 
-        private string destinationPath = "Assets/Resources/ScriptableResources/Languages/";
+        private string destinationPath = "Assets/Resources/Languages/";
         
         private const string key = "Key";
 
@@ -59,32 +59,17 @@ namespace WhateverDevs.Localization
             int col = gameParametersData[0].Count;
             
             for (int i = 0; i < col-1; ++i) localizationMap.Add(new List<LanguagePair>());
-            
-            LanguagePair[] item = new LanguagePair[col];
+
+            LanguagePair item;
 
             for (int i = 0; i < gameParametersData.Count; ++i)
             {
-                for (int z = 0; z < col-1; ++z)
+                for (int j = 1; j < gameParametersData[i].Count; ++j)
                 {
-                    for (int j = 0; j < gameParametersData[i].Count; ++j)
-                    {
-                        if (gameParametersData[i].ElementAt(j).Key == key)
-                        {
-                            item = new LanguagePair[col - 1];
-
-                            for (int x = 0; x < item.Length; ++x)
-                            {
-                                item[x] = new LanguagePair();
-                                item[x].Key = gameParametersData[i].ElementAt(j).Value;
-                            }
-                        }
-                        else
-                        {
-                            item[z].Value = gameParametersData[i].ElementAt(z+1).Value;
-
-                            localizationMap[z].Add(item[z]);
-                        }
-                    }
+                    item = new LanguagePair();
+                    item.Key = gameParametersData[i].ElementAt(0).Value;
+                    item.Value = gameParametersData[i].ElementAt(j).Value;
+                    localizationMap[j-1].Add(item);
                 }
             }
 

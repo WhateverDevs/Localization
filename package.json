@@ -4,6 +4,7 @@
   "displayName": "Localization",
   "description": "Localization.",
   "dependencies": {
+		"whateverdevs.extenject": "9.1.1",
   		"whateverdevs.core": "0.0.11"
   },
   "unity": "2019.1",

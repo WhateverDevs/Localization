@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
 using WhateverDevs.Localizer.Runtime;
@@ -15,7 +14,7 @@ namespace WhateverDevs.Localization
         /// <summary>
         /// Configuration
         /// </summary>
-        protected LocalizerConfiguration configuration;
+        private LocalizerConfiguration configuration;
         
         /// <summary>
         ///     List of all the languages
@@ -41,7 +40,11 @@ namespace WhateverDevs.Localization
         /// <summary>
         ///     Init
         /// </summary>
-        public void Init() => LoadValues();
+        public void Init(LocalizerConfiguration newConfiguration)
+        {
+            configuration = newConfiguration;
+            LoadValues();
+        }
 
         /// <summary>
         ///     Load all the languages from the scriptables objects

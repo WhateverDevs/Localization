@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
 using WhateverDevs.Localizer.Runtime;
@@ -68,6 +69,8 @@ namespace WhateverDevs.Localization
                     if (tempScript != null)
                     {
                         LanguagePack temp = new LanguagePack();
+                        
+                        temp.Language = (SystemLanguage) Enum.Parse(typeof(SystemLanguage),tempScript.name);
 
                         for (int j = 0; j < tempScript.Language.Count; ++j)
                         {

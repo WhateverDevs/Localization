@@ -19,6 +19,6 @@ namespace WhateverDevs.Localizer.Runtime
     {
         public List<SystemLanguage> languages;
         
-        public string languagePackDirectory = "ScriptableResources/Languages/";
+        public string languagePackDirectory = "Languages/";
     }
 }

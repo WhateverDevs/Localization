@@ -31,7 +31,11 @@ namespace WhateverDevs.Localization
         /// </summary>
         private int _CurrentLanguage = 0;
 
-        public int CurrentLanguage => _CurrentLanguage;
+        public int CurrentLanguage
+        {
+            get { return _CurrentLanguage; }
+            set { _CurrentLanguage = value; }
+        }
 
         #endregion
 

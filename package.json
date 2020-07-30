@@ -1,0 +1,15 @@
+{
+  "name": "whateverdevs.localization",
+  "version": "0.0.5",
+  "displayName": "Localization",
+  "description": "Localization.",
+  "dependencies": {
+    "whateverdevs.extenject": "9.1.1",
+    "whateverdevs.core": "0.0.11"
+  },
+  "unity": "2019.1",
+  "author": {
+    "name": "Whatever Devs",
+    "url": "https://discord.gg/B8aaMzJ"
+  }
+}

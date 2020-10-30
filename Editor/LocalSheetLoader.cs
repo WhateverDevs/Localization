@@ -19,7 +19,7 @@ namespace WhateverDevs.Localization
 
         private static readonly Dictionary<string, string> _loadedSheet = new Dictionary<string, string>();
 
-        private string fileToLoad = "/ExcelTest.csv";
+        private string fileToLoad = "/Data/Language/LanguageExcel.csv";
 
         private string destinationPath = "Assets/Resources/Languages/";
         

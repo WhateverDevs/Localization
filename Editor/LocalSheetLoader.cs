@@ -25,7 +25,7 @@ namespace WhateverDevs.Localization
         
         private const string key = "Key";
 
-        [MenuItem("Tools/Localization/LocalFile")]
+        [MenuItem("WhateverDevs/Localization/LocalFile")]
         public static void ShowWindow() => GetWindow(typeof(LocalSheetLoader));
 
         private void OnGUI()

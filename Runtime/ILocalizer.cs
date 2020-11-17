@@ -9,5 +9,7 @@
         ///     List of all the configurations this manager handles.
         /// </summary>
         string GetText(string key);
+
+        string this[string key] { get; }
     }
 }

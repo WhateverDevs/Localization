@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Configuration;
 
-namespace WhateverDevs.Localizer.Runtime
+namespace WhateverDevs.Localization
 {
-    [CreateAssetMenu(menuName = "WhateverDevs/Localizer/Configuration",
-        fileName = "LocalizerConfiguration")]
-    public class LocalizerConfiguration : ConfigurationScriptableHolderUsingFirstValidPersister<LocalizerConfigurationData>
+    [CreateAssetMenu(menuName = "WhateverDevs/Localization/Configuration",
+                     fileName = "LocalizerConfiguration")]
+    public class
+        LocalizerConfiguration : ConfigurationScriptableHolderUsingFirstValidPersister<LocalizerConfigurationData>
     {
     }
 
@@ -17,8 +18,8 @@ namespace WhateverDevs.Localizer.Runtime
     [Serializable]
     public class LocalizerConfigurationData : ConfigurationData
     {
-        public List<SystemLanguage> languages;
-        
-        public string languagePackDirectory = "Languages/";
+        public List<SystemLanguage> Languages;
+
+        public string LanguagePackDirectory = "Languages/";
     }
 }

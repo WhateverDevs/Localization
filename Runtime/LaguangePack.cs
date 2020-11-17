@@ -46,7 +46,7 @@ namespace WhateverDevs.Localization
             if (strings.ContainsKey(key)) return strings[key];
 
             GetLogger().Error("Bad key :" + key);
-            return "BAD KEY" + key;
+            return key;
         }
     }
 }

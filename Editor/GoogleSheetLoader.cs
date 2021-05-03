@@ -2,7 +2,6 @@
 using UnityEditor;
 using UnityEngine;
 using WhateverDevs.Localization;
-using WhateverDevs.Localizer.Runtime;
 
 /// <summary>
 ///     Class to load different Google sheets
@@ -38,7 +37,7 @@ public class GoogleSheetsLoader : EditorWindow
     ///     Load Languages
     /// </summary>
     /// <returns>IEnumerator</returns>
-    [MenuItem("Tools/Localization/GoogleDrive")]
+    [MenuItem("WhateverDevs/Localization/GoogleDrive")]
     public static void LoadLanguages()
     {
         localizationMap = new List<List<LanguagePair>>();

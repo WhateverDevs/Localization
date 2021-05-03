@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
-using WhateverDevs.Localizer.Runtime;
+using WhateverDevs.Core.Runtime.Configuration;
+using Zenject;
+using Object = System.Object;
 
 namespace WhateverDevs.Localization
 {
@@ -12,30 +14,31 @@ namespace WhateverDevs.Localization
     public class Localizer : Loggable<Localizer>, ILocalizer
     {
         #region Params
+
         /// <summary>
         /// Configuration
         /// </summary>
-        private LocalizerConfiguration configuration;
-        
+        private LocalizerConfigurationData configuration;
+
         /// <summary>
         ///     List of all the languages
         /// </summary>
-        private readonly List<LanguagePack> _LanguagesPack = new List<LanguagePack>();
+        private readonly List<LanguagePack> languagePacks = new List<LanguagePack>();
 
         /// <summary>
         ///     Flag to know
         /// </summary>
-        private bool _LanguagesLoaded;
+        private bool languagesLoaded;
 
         /// <summary>
         ///     CurrentLanguage
         /// </summary>
-        private int _CurrentLanguage = 0;
+        private int currentLanguage;
 
         public int CurrentLanguage
         {
-            get { return _CurrentLanguage; }
-            set { _CurrentLanguage = value; }
+            get => currentLanguage;
+            set => currentLanguage = value;
         }
 
         #endregion
@@ -45,9 +48,12 @@ namespace WhateverDevs.Localization
         /// <summary>
         ///     Init
         /// </summary>
-        public void Init(LocalizerConfiguration newConfiguration)
+        [Inject]
+        public void Construct(IConfigurationManager configurationManager)
         {
-            configuration = newConfiguration;
+            if (!configurationManager.GetConfiguration(out configuration))
+                GetLogger().Error("Error retrieving localizer configuration.");
+
             LoadValues();
         }
 
@@ -56,35 +62,34 @@ namespace WhateverDevs.Localization
         /// </summary>
         private void LoadValues()
         {
-            if (_LanguagesLoaded == false)
+            if (languagesLoaded) return;
+            string auxPath = configuration.LanguagePackDirectory;
+
+            // TODO : Figure out this warning.
+            object[] tempObject = Resources.LoadAll(auxPath, typeof(ScriptableLanguage));
+
+            for (int i = 0; i < tempObject.Length; ++i)
             {
-                string auxPath = configuration.ConfigurationData.languagePackDirectory;
+                ScriptableLanguage tempScript = tempObject[i] as ScriptableLanguage;
 
-                object[] tempObject = Resources.LoadAll(auxPath, typeof(ScriptableLanguage));
+                if (tempScript == null) continue;
 
-                for (int i = 0; i < tempObject.Length; ++i)
+                LanguagePack temp = new LanguagePack
+                                    {
+                                        Language = (SystemLanguage) Enum.Parse(typeof(SystemLanguage), tempScript.name)
+                                    };
+
+                for (int j = 0; j < tempScript.Language.Count; ++j)
                 {
-                    ScriptableLanguage tempScript = tempObject[i] as ScriptableLanguage;
-
-                    if (tempScript != null)
-                    {
-                        LanguagePack temp = new LanguagePack();
-                        
-                        temp.Language = (SystemLanguage) Enum.Parse(typeof(SystemLanguage),tempScript.name);
-
-                        for (int j = 0; j < tempScript.Language.Count; ++j)
-                        {
-                            string key = tempScript.Language[j].Key;
-                            string value = tempScript.Language[j].Value;
-                            temp.AddNewString(key, value);
-                        }
-
-                        _LanguagesPack.Add(temp);
-                    }
+                    string key = tempScript.Language[j].Key;
+                    string value = tempScript.Language[j].Value;
+                    temp.AddNewString(key, value);
                 }
 
-                _LanguagesLoaded = true;
+                languagePacks.Add(temp);
             }
+
+            languagesLoaded = true;
         }
 
         #endregion
@@ -92,9 +97,9 @@ namespace WhateverDevs.Localization
         /// <summary>
         ///     Getting the value for a key in the current language
         /// </summary>
-        public string GetText(string _key)
+        public string GetText(string key)
         {
-            if (_LanguagesLoaded) return _LanguagesPack[_CurrentLanguage].GetString(_key);
+            if (languagesLoaded) return languagePacks[currentLanguage].GetString(key);
 
             GetLogger().Error("The languages are not loaded yet!!");
             return "The languages are not loaded yet!!";

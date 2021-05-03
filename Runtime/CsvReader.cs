@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 /// </summary>
 public class CsvReader
 {
-    private static readonly string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
+    private static readonly string SPLIT_RE = @";(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
     private static readonly string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
     private static readonly char[] TRIM_CHARS = {'\"'};
 

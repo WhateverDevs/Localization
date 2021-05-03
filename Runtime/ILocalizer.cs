@@ -11,5 +11,7 @@
         string GetText(string key);
 
         string this[string key] { get; }
+
+        int CurrentLanguage { get; set; }
     }
 }

@@ -18,8 +18,6 @@ namespace WhateverDevs.Localization
     [Serializable]
     public class LocalizerConfigurationData : ConfigurationData
     {
-        public List<SystemLanguage> Languages;
-
         public string LanguagePackDirectory = "Languages/";
     }
 }

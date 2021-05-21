@@ -1,64 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
 using WhateverDevs.Core.Runtime.Configuration;
 using Zenject;
-using Object = UnityEngine.Object;
 
 namespace WhateverDevs.Localization.Runtime
 {
     /// <summary>
-    ///     Localizer class
+    /// Localizer class
     /// </summary>
     public class Localizer : Loggable<Localizer>, ILocalizer
     {
-        #region Params
-
         /// <summary>
         /// Configuration
         /// </summary>
         private LocalizerConfigurationData configuration;
 
         /// <summary>
-        ///     List of all the languages
+        /// List of all the languages
         /// </summary>
         private readonly List<LanguagePack> languagePacks = new List<LanguagePack>();
 
         /// <summary>
-        ///     Flag to know
+        /// Flag to know
         /// </summary>
         private bool languagesLoaded;
 
         /// <summary>
-        ///     CurrentLanguage
+        /// CurrentLanguage
         /// </summary>
         private int currentLanguage;
 
-        public int CurrentLanguage
-        {
-            get => currentLanguage;
-            set => currentLanguage = value;
-        }
-
-        #endregion
-
-        #region Load
+        /// <summary>
+        /// Reference to the configuration manager.
+        /// </summary>
+        private IConfigurationManager configurationManager;
 
         /// <summary>
-        ///     Init
+        /// Init.
         /// </summary>
         [Inject]
-        public void Construct(IConfigurationManager configurationManager)
+        public void Construct(IConfigurationManager configurationManagerReference)
         {
+            configurationManager = configurationManagerReference;
+
             if (!configurationManager.GetConfiguration(out configuration))
                 GetLogger().Error("Error retrieving localizer configuration.");
 
             LoadValues();
+
+            SetLanguage(configuration.SelectedLanguage);
         }
 
         /// <summary>
-        ///     Load all the languages from the scriptables objects
+        /// Load all the languages from the scriptables objects
         /// </summary>
         private void LoadValues()
         {
@@ -73,10 +68,7 @@ namespace WhateverDevs.Localization.Runtime
 
                 if (tempScript == null) continue;
 
-                LanguagePack temp = new LanguagePack
-                                    {
-                                        Language = tempScript.name
-                                    };
+                LanguagePack temp = new LanguagePack {Language = tempScript.name};
 
                 for (int j = 0; j < tempScript.Language.Count; ++j)
                 {
@@ -91,10 +83,8 @@ namespace WhateverDevs.Localization.Runtime
             languagesLoaded = true;
         }
 
-        #endregion
-
         /// <summary>
-        ///     Getting the value for a key in the current language
+        /// Getting the value for a key in the current language
         /// </summary>
         public string GetText(string key)
         {
@@ -105,5 +95,29 @@ namespace WhateverDevs.Localization.Runtime
         }
 
         public string this[string key] => GetText(key);
+
+        public string GetCurrentLanguage() => languagePacks[currentLanguage].Language;
+
+        public int GetCurrentLanguageId() => currentLanguage;
+
+        public void SetLanguage(string language)
+        {
+            for (int i = 0; i < languagePacks.Count; ++i)
+            {
+                if (languagePacks[i].Language != language) continue;
+                SetLanguage(i);
+                return;
+            }
+
+            Logger.Error("Language " + language + " does not exist!");
+        }
+
+        public void SetLanguage(int language)
+        {
+            currentLanguage = language;
+
+            configuration.SelectedLanguage = languagePacks[currentLanguage].Language;
+            if (!configurationManager.SetConfiguration(configuration)) Logger.Error("Error saving configuration!");
+        }
     }
 }

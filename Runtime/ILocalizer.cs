@@ -12,6 +12,12 @@
 
         string this[string key] { get; }
 
-        int CurrentLanguage { get; set; }
+        string GetCurrentLanguage();
+        
+        int GetCurrentLanguageId();
+
+        void SetLanguage(string language);
+        
+        void SetLanguage(int language);
     }
 }

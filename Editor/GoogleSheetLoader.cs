@@ -1,157 +1,133 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using WhateverDevs.Localization;
+using WhateverDevs.Localization.Runtime;
 
-/// <summary>
-///     Class to load different Google sheets
-/// </summary>
-[ExecuteInEditMode]
-public class GoogleSheetsLoader : EditorWindow
+namespace WhateverDevs.Localization.Editor
 {
-    #region Localization
-
     /// <summary>
-    ///     LocalizationMap
+    ///     Class to load different Google sheets
     /// </summary>
-    private static List<List<LanguagePair>> localizationMap;
-
-    private LocalizerConfigurationData configurationData;
-    
-    private static string GoogleDriveFormat = "";
-        
-    private static string LocalizationDriveID = "";
-        
-    private static string[] LocalizationSheetID = {"0"};
-
-    #endregion
-
-    private static readonly Dictionary<string, string> _loadedSheet = new Dictionary<string, string>();
-
-    /// <summary>
-    ///     ServerCall www
-    /// </summary>
-    private static WWW serverCall;
-
-    /// <summary>
-    ///     Load Languages
-    /// </summary>
-    /// <returns>IEnumerator</returns>
-    [MenuItem("WhateverDevs/Localization/GoogleDrive")]
-    public static void LoadLanguages()
+    public class GoogleSheetsLoader : EditorWindow
     {
-        localizationMap = new List<List<LanguagePair>>();
+        private LocalizerConfiguration configuration;
 
-        float progress = 0.0f;
+        private string downLoadUrl = "";
 
-        EditorUtility.DisplayProgressBar("Loading languages", "Loading...", progress);
+        private bool deleteFileWhenFinished = true;
 
-        //for (int i = 0; i < (int) Localizer.eLanguage.COUNT; ++i) localizationMap.Add(new List<LanguagePair>());
+        private const string TemporalPath = "Temp/LocalizationFile.csv";
 
-        for (int i = 0; i < LocalizationSheetID.Length; ++i)
+        [MenuItem("WhateverDevs/Localization/GoogleDrive")]
+        public static void ShowWindow() => GetWindow(typeof(GoogleSheetsLoader));
+
+        private void OnGUI()
         {
-            progress = i / (float) LocalizationSheetID.Length;
+            EditorGUILayout.HelpBox("This tool currently parses csv files, not the actual sheet.",
+                                    MessageType.Warning);
 
-            LoadGoogleSheet(LocalizationDriveID, LocalizationSheetID[i]);
+            GUILayout.Label("CSV Parser", EditorStyles.boldLabel);
 
-            ParseLocalizationData(serverCall.text);
-
-            EditorUtility.DisplayProgressBar("Loading languages", "Loading...", progress);
-        }
-
-        EditorUtility.DisplayProgressBar("Loading languages", "Loading...", 1.0f);
-        EditorUtility.ClearProgressBar();
-    }
-
-    /// <summary>
-    ///     Coroutine which downloads the Google Sheet in CSV format and parses it on success
-    /// </summary>
-    /// <param name="docId">The document's unique identifier on Google Drive</param>
-    /// <param name="sheetId">The sheet's unique identifier in the Google Sheets document</param>
-    public static void LoadGoogleSheet(string docId, string sheetId)
-    {
-        _loadedSheet.Clear();
-
-        string downloadUrl = string.Format(GoogleDriveFormat, docId, sheetId);
-
-        serverCall = new WWW(downloadUrl);
-
-        while (serverCall.isDone == false)
-        {
-        }
-
-        if (!string.IsNullOrEmpty(serverCall.error)) Debug.LogError("Unable to fetch CSV data from Google");
-    }
-
-    /// <summary>
-    ///     Parses the downloaded CSV formatted Google Sheet
-    /// </summary>
-    /// <param name="csvData">The Google Sheet in CSV format</param>
-    private static void ParseLocalizationData(string csvData)
-    {
-        if (string.IsNullOrEmpty(csvData)) return;
-
-        List<Dictionary<string, string>> gameParametersData = CsvReader.Read(csvData);
-
-        /*LanguagePair[] item = new LanguagePair[(int) Localizer.eLanguage.COUNT];
-
-        for (int i = 0; i < gameParametersData.Count; ++i)
-        {
-            for (int j = 0; j < gameParametersData[i].Count; ++j)
+            if (configuration == null)
             {
-                for (int z = 0; z < (int) Localizer.eLanguage.COUNT; ++z)
-                    if (gameParametersData[i].ElementAt(j).Key == "KEY")
-                    {
-                        item = new LanguagePair[(int) Localizer.eLanguage.COUNT];
+                configuration = (LocalizerConfiguration)
+                    EditorGUILayout.ObjectField(new GUIContent("Configuration"),
+                                                configuration,
+                                                typeof(LocalizerConfiguration),
+                                                false);
 
-                        for (int x = 0; x < item.Length; ++x)
-                        {
-                            item[x] = new LanguagePair();
-                            item[x].Key = gameParametersData[i].ElementAt(j).Value;
-                        }
-                    }
-                    else if (gameParametersData[i].ElementAt(j).Key == ((Localizer.eLanguage) z).ToString())
-                    {
-                        item[z].Value = gameParametersData[i].ElementAt(j).Value;
+                return;
+            }
 
-                        localizationMap[z].Add(item[z]);
-                    }
+            EditorGUILayout.HelpBox("The file in drive must be shared publicly!", MessageType.Warning);
+            downLoadUrl = EditorGUILayout.TextField("Url to file", downLoadUrl);
+
+            deleteFileWhenFinished = EditorGUILayout.Toggle("Delete file when finished", deleteFileWhenFinished);
+
+            if (GUILayout.Button("Download and Parse")) LoadLanguages();
+        }
+
+        /// <summary>
+        ///     Load Languages
+        /// </summary>
+        /// <returns>IEnumerator</returns>
+        private void LoadLanguages()
+        {
+            try
+            {
+                EditorUtility.DisplayProgressBar("Loading languages", "Downloading file...", .25f);
+
+                if (File.Exists(TemporalPath)) File.Delete(TemporalPath);
+
+                FileInfo file = DriveFileDownloader.DownloadFileFromURLToPath(downLoadUrl, TemporalPath);
+
+                EditorUtility.DisplayProgressBar("Loading languages", "Parsing file...", .5f);
+
+                ParseLocalizationData(File.ReadAllText(file.FullName));
+
+                if (deleteFileWhenFinished) file.Delete();
+            }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
             }
         }
 
-        for (int i = 0; i < (int) Localizer.eLanguage.COUNT; ++i)
+        /// <summary>
+        ///     Parses the CSV formatted Sheet
+        /// </summary>
+        /// <param name="csvData">The Sheet in CSV format</param>
+        private void ParseLocalizationData(string csvData)
         {
-            ScriptableLanguage asset = CreateInstance<ScriptableLanguage>();
+            List<List<LanguagePair>> localizationMap = new List<List<LanguagePair>>();
+            List<Dictionary<string, string>> gameParametersData = CsvReader.Read(csvData);
 
-            AssetDatabase.CreateAsset(asset,
-                                      "Assets/Resources/ScriptableResources/Languages/"
-                                    + (Localizer.eLanguage) i
-                                    + ".asset");
+            int col = gameParametersData[0].Count;
 
-            asset.Language = localizationMap[i];
+            for (int i = 0; i < col - 1; ++i) localizationMap.Add(new List<LanguagePair>());
 
-            EditorUtility.SetDirty(asset);
+            for (int i = 0; i < gameParametersData.Count; ++i)
+            {
+                for (int j = 1; j < gameParametersData[i].Count; ++j)
+                {
+                    LanguagePair item = new LanguagePair
+                                        {
+                                            Key = gameParametersData[i].ElementAt(0).Value,
+                                            Value = gameParametersData[i].ElementAt(j).Value
+                                        };
 
-            AssetDatabase.SaveAssets();
+                    localizationMap[j - 1].Add(item);
+                }
+            }
 
-            AssetDatabase.Refresh();
+            string folderPath = "Assets/Resources/"
+                              + configuration.ConfigurationData.LanguagePackDirectory;
 
-            EditorUtility.FocusProjectWindow();
+            if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
 
-            Selection.activeObject = asset;
-        }*/
-    }
+            for (int i = 0; i < col - 1; ++i)
+            {
+                ScriptableLanguage asset = CreateInstance<ScriptableLanguage>();
 
-    /// <summary>
-    ///     Stores the loaded parameter configuration locally
-    /// </summary>
-    /// <param name="paramName">The configuration parameter name</param>
-    /// <param name="paramValue">The configuration parameter value</param>
-    private void ApplyDataFromRow(string paramName, string paramValue)
-    {
-        if (_loadedSheet.ContainsKey(paramName))
-            _loadedSheet[paramName] = paramValue;
-        else
-            _loadedSheet.Add(paramName, paramValue);
+                AssetDatabase.CreateAsset(asset,
+                                          folderPath
+                                        + gameParametersData[0].ElementAt(i + 1).Key
+                                        + ".asset");
+
+                asset.Language = localizationMap[i];
+
+                EditorUtility.SetDirty(asset);
+
+                AssetDatabase.SaveAssets();
+
+                AssetDatabase.Refresh();
+
+                EditorUtility.FocusProjectWindow();
+
+                Selection.activeObject = asset;
+            }
+        }
     }
 }

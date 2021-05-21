@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Configuration;
 
-namespace WhateverDevs.Localization
+namespace WhateverDevs.Localization.Runtime
 {
     [CreateAssetMenu(menuName = "WhateverDevs/Localization/Configuration",
                      fileName = "LocalizerConfiguration")]

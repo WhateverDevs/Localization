@@ -4,9 +4,9 @@ using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
 using WhateverDevs.Core.Runtime.Configuration;
 using Zenject;
-using Object = System.Object;
+using Object = UnityEngine.Object;
 
-namespace WhateverDevs.Localization
+namespace WhateverDevs.Localization.Runtime
 {
     /// <summary>
     ///     Localizer class
@@ -65,18 +65,17 @@ namespace WhateverDevs.Localization
             if (languagesLoaded) return;
             string auxPath = configuration.LanguagePackDirectory;
 
-            // TODO : Figure out this warning.
-            object[] tempObject = Resources.LoadAll(auxPath, typeof(ScriptableLanguage));
+            ScriptableLanguage[] tempObject = Resources.LoadAll<ScriptableLanguage>(auxPath);
 
             for (int i = 0; i < tempObject.Length; ++i)
             {
-                ScriptableLanguage tempScript = tempObject[i] as ScriptableLanguage;
+                ScriptableLanguage tempScript = tempObject[i];
 
                 if (tempScript == null) continue;
 
                 LanguagePack temp = new LanguagePack
                                     {
-                                        Language = (SystemLanguage) Enum.Parse(typeof(SystemLanguage), tempScript.name)
+                                        Language = tempScript.name
                                     };
 
                 for (int j = 0; j < tempScript.Language.Count; ++j)

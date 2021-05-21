@@ -1,4 +1,4 @@
-﻿namespace WhateverDevs.Localization
+﻿namespace WhateverDevs.Localization.Runtime
 {
     /// <summary>
     ///     Interface that defines how a configuration manager should work.

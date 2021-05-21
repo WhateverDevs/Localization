@@ -1,7 +1,7 @@
 using UnityEngine;
 using Zenject;
 
-namespace WhateverDevs.Localization
+namespace WhateverDevs.Localization.Runtime
 {
     [CreateAssetMenu(fileName = "LocalizationInstaller", menuName = "WhateverDevs/Localization/Installer")]
     public class LocalizationInstaller : ScriptableObjectInstaller

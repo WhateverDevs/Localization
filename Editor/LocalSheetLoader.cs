@@ -3,13 +3,13 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using WhateverDevs.Localization.Runtime;
 
-namespace WhateverDevs.Localization
+namespace WhateverDevs.Localization.Editor
 {
     /// <summary>
     ///     GoogleSheetsLoader from a SpreadSheet to a List of Localizer.Pair
     /// </summary>
-    [ExecuteInEditMode]
     public class LocalSheetLoader : EditorWindow
     {
         /// <summary>
@@ -17,19 +17,20 @@ namespace WhateverDevs.Localization
         /// </summary>
         private static List<List<LanguagePair>> localizationMap;
 
-        private static readonly Dictionary<string, string> _loadedSheet = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> LoadedSheet = new Dictionary<string, string>();
 
         private string fileToLoad = "/Data/Language/LanguageExcel.csv";
 
         private string destinationPath = "Assets/Resources/Languages/";
-        
-        private const string key = "Key";
 
         [MenuItem("WhateverDevs/Localization/LocalFile")]
         public static void ShowWindow() => GetWindow(typeof(LocalSheetLoader));
 
         private void OnGUI()
         {
+            EditorGUILayout.HelpBox("This is obsolete, we should probably review all the code before using.",
+                                    MessageType.Error);
+
             GUILayout.Label("CSV Parser", EditorStyles.boldLabel);
             fileToLoad = EditorGUILayout.TextField("Csv file to load", fileToLoad);
             destinationPath = EditorGUILayout.TextField("Destination file to load", destinationPath);
@@ -57,27 +58,29 @@ namespace WhateverDevs.Localization
             List<Dictionary<string, string>> gameParametersData = CsvReader.Read(csvData);
 
             int col = gameParametersData[0].Count;
-            
-            for (int i = 0; i < col-1; ++i) localizationMap.Add(new List<LanguagePair>());
 
-            LanguagePair item;
+            for (int i = 0; i < col - 1; ++i) localizationMap.Add(new List<LanguagePair>());
 
             for (int i = 0; i < gameParametersData.Count; ++i)
             {
                 for (int j = 1; j < gameParametersData[i].Count; ++j)
                 {
-                    item = new LanguagePair();
-                    item.Key = gameParametersData[i].ElementAt(0).Value;
-                    item.Value = gameParametersData[i].ElementAt(j).Value;
-                    localizationMap[j-1].Add(item);
+                    LanguagePair item = new LanguagePair
+                                        {
+                                            Key = gameParametersData[i].ElementAt(0).Value,
+                                            Value = gameParametersData[i].ElementAt(j).Value
+                                        };
+
+                    localizationMap[j - 1].Add(item);
                 }
             }
 
-            for (int i = 0; i < col-1; ++i)
+            for (int i = 0; i < col - 1; ++i)
             {
                 ScriptableLanguage asset = CreateInstance<ScriptableLanguage>();
 
-                AssetDatabase.CreateAsset(asset,destinationPath + gameParametersData[0].ElementAt(i+1).Key + ".asset");
+                AssetDatabase.CreateAsset(asset,
+                                          destinationPath + gameParametersData[0].ElementAt(i + 1).Key + ".asset");
 
                 asset.Language = localizationMap[i];
 
@@ -91,19 +94,6 @@ namespace WhateverDevs.Localization
 
                 Selection.activeObject = asset;
             }
-        }
-
-        /// <summary>
-        ///     Stores the loaded parameter configuration locally
-        /// </summary>
-        /// <param name="paramName">The configuration parameter name</param>
-        /// <param name="paramValue">The configuration parameter value</param>
-        private void ApplyDataFromRow(string paramName, string paramValue)
-        {
-            if (_loadedSheet.ContainsKey(paramName))
-                _loadedSheet[paramName] = paramValue;
-            else
-                _loadedSheet.Add(paramName, paramValue);
         }
     }
 }

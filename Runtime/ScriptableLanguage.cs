@@ -1,23 +1,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace WhateverDevs.Localization
+namespace WhateverDevs.Localization.Runtime
 {
     /// <summary>
-    ///     Scriptabale class to collect all the values for a language
+    /// Scriptable class to collect all the values for a language
     /// </summary>
     public class ScriptableLanguage : ScriptableObject
     {
         public List<LanguagePair> Language = new List<LanguagePair>();
 
-        public void SetValues(string[] _values, string[] _keys)
+        public void SetValues(string[] values, string[] keys)
         {
-            for (int i = 0; i < _values.Length; ++i)
+            for (int i = 0; i < values.Length; ++i)
             {
                 LanguagePair pair = new LanguagePair
                                     {
-                                        Key = _keys[i],
-                                        Value = _values[i]
+                                        Key = keys[i],
+                                        Value = values[i]
                                     };
 
                 Language.Add(pair);

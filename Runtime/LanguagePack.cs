@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
 
-namespace WhateverDevs.Localization
+namespace WhateverDevs.Localization.Runtime
 {
     /// <summary>
     ///     Class to save the key with the proper Language values
@@ -21,15 +20,15 @@ namespace WhateverDevs.Localization
     [Serializable]
     public class LanguagePack : Loggable<LanguagePack>
     {
-        public SystemLanguage Language = SystemLanguage.English;
+        public string Language;
         
-        public Dictionary<string, string> strings = new Dictionary<string, string>();
+        public Dictionary<string, string> Strings = new Dictionary<string, string>();
 
         public bool AddNewString(string key, string text)
         {
-            if (!strings.ContainsKey(key))
+            if (!Strings.ContainsKey(key))
             {
-                strings.Add(key, text);
+                Strings.Add(key, text);
                 return true;
             }
 
@@ -43,7 +42,7 @@ namespace WhateverDevs.Localization
         /// <param name="key">key to get the localized text</param>
         public string GetString(string key)
         {
-            if (strings.ContainsKey(key)) return strings[key];
+            if (Strings.ContainsKey(key)) return Strings[key];
 
             GetLogger().Error("Bad key :" + key);
             return key;

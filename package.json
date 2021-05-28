@@ -5,11 +5,12 @@
   "description": "Localization.",
   "dependencies": {
     "whateverdevs.extenject": "9.1.1",
-    "whateverdevs.core": "0.0.59"
+    "whateverdevs.core": "0.0.69"
   },
-  "unity": "2020.1",
+  "unity": "2020.3",
   "author": {
     "name": "Whatever Devs",
     "url": "https://discord.gg/B8aaMzJ"
-  }
+  },
+  "unityRelease": "10f1"
 }

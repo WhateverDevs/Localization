@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
 using WhateverDevs.Core.Runtime.Configuration;
@@ -35,6 +36,11 @@ namespace WhateverDevs.Localization.Runtime
         /// Reference to the configuration manager.
         /// </summary>
         private IConfigurationManager configurationManager;
+
+        /// <summary>
+        /// Event raised when the language is changed.
+        /// </summary>
+        private Action<string> languageChanged;
 
         /// <summary>
         /// Init.
@@ -118,6 +124,19 @@ namespace WhateverDevs.Localization.Runtime
 
             configuration.SelectedLanguage = languagePacks[currentLanguage].Language;
             if (!configurationManager.SetConfiguration(configuration)) Logger.Error("Error saving configuration!");
+            
+            languageChanged?.Invoke(GetCurrentLanguage());
         }
+
+        /// <summary>
+        /// Subscribe to the language changed event.
+        /// </summary>
+        /// <param name="callback"></param>
+        public void SubscribeToLanguageChange(Action<string> callback) => languageChanged += callback;
+
+        /// <summary>
+        /// Subscribe to the language changed event.
+        /// </summary>
+        public void SubscribeToLanguageChange(Action callback) => languageChanged += language => callback?.Invoke();
     }
 }

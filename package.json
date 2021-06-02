@@ -1,6 +1,6 @@
 {
   "name": "whateverdevs.localization",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "displayName": "Localization",
   "description": "Localization.",
   "dependencies": {

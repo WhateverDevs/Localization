@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using UnityEngine;
+using WhateverDevs.Core.Runtime.DataStructures;
 
 namespace WhateverDevs.Localization.Runtime
 {
@@ -8,20 +8,6 @@ namespace WhateverDevs.Localization.Runtime
     /// </summary>
     public class ScriptableLanguage : ScriptableObject
     {
-        public List<LanguagePair> Language = new List<LanguagePair>();
-
-        public void SetValues(string[] values, string[] keys)
-        {
-            for (int i = 0; i < values.Length; ++i)
-            {
-                LanguagePair pair = new LanguagePair
-                                    {
-                                        Key = keys[i],
-                                        Value = values[i]
-                                    };
-
-                Language.Add(pair);
-            }
-        }
+        public SerializableDictionary<string, string> Language = new SerializableDictionary<string, string>();
     }
 }

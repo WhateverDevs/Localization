@@ -5,16 +5,6 @@ using WhateverDevs.Core.Runtime.Common;
 namespace WhateverDevs.Localization.Runtime
 {
     /// <summary>
-    ///     Class to save the key with the proper Language values
-    /// </summary>
-    [Serializable]
-    public class LanguagePair
-    {
-        public string Key = "";
-        public string Value = "";
-    }
-
-    /// <summary>
     ///     Class to collect all the info
     /// </summary>
     [Serializable]

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using WhateverDevs.Core.Runtime.DataStructures;
 using WhateverDevs.Localization.Runtime;
 
 namespace WhateverDevs.Localization.Editor
@@ -81,25 +82,20 @@ namespace WhateverDevs.Localization.Editor
         /// <param name="csvData">The Sheet in CSV format</param>
         private void ParseLocalizationData(string csvData)
         {
-            List<List<LanguagePair>> localizationMap = new List<List<LanguagePair>>();
+            List<SerializableDictionary<string, string>> localizationMap =
+                new List<SerializableDictionary<string, string>>();
+
             List<Dictionary<string, string>> gameParametersData = CsvReader.Read(csvData);
 
             int col = gameParametersData[0].Count;
 
-            for (int i = 0; i < col - 1; ++i) localizationMap.Add(new List<LanguagePair>());
+            for (int i = 0; i < col - 1; ++i) localizationMap.Add(new SerializableDictionary<string, string>());
 
             for (int i = 0; i < gameParametersData.Count; ++i)
             {
                 for (int j = 1; j < gameParametersData[i].Count; ++j)
-                {
-                    LanguagePair item = new LanguagePair
-                                        {
-                                            Key = gameParametersData[i].ElementAt(0).Value,
-                                            Value = gameParametersData[i].ElementAt(j).Value
-                                        };
-
-                    localizationMap[j - 1].Add(item);
-                }
+                    localizationMap[j - 1][gameParametersData[i].ElementAt(0).Value] =
+                        gameParametersData[i].ElementAt(j).Value;
             }
 
             string folderPath = "Assets/Resources/"

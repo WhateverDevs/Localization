@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using WhateverDevs.Core.Runtime.DataStructures;
 using WhateverDevs.Localization.Runtime;
 
 namespace WhateverDevs.Localization.Editor
@@ -15,7 +16,7 @@ namespace WhateverDevs.Localization.Editor
         /// <summary>
         ///     LocalizationMap
         /// </summary>
-        private static List<List<LanguagePair>> localizationMap;
+        private static List<SerializableDictionary<string, string>> localizationMap;
 
         private static readonly Dictionary<string, string> LoadedSheet = new Dictionary<string, string>();
 
@@ -42,7 +43,7 @@ namespace WhateverDevs.Localization.Editor
         /// </summary>
         private void ParseCsvToScriptableLanguages()
         {
-            localizationMap = new List<List<LanguagePair>>();
+            localizationMap = new List<SerializableDictionary<string, string>>();
 
             string allText = File.ReadAllText(Application.dataPath + fileToLoad);
 
@@ -59,20 +60,13 @@ namespace WhateverDevs.Localization.Editor
 
             int col = gameParametersData[0].Count;
 
-            for (int i = 0; i < col - 1; ++i) localizationMap.Add(new List<LanguagePair>());
+            for (int i = 0; i < col - 1; ++i) localizationMap.Add(new SerializableDictionary<string, string>());
 
             for (int i = 0; i < gameParametersData.Count; ++i)
             {
                 for (int j = 1; j < gameParametersData[i].Count; ++j)
-                {
-                    LanguagePair item = new LanguagePair
-                                        {
-                                            Key = gameParametersData[i].ElementAt(0).Value,
-                                            Value = gameParametersData[i].ElementAt(j).Value
-                                        };
-
-                    localizationMap[j - 1].Add(item);
-                }
+                    localizationMap[j - 1][gameParametersData[i].ElementAt(0).Value] =
+                        gameParametersData[i].ElementAt(j).Value;
             }
 
             for (int i = 0; i < col - 1; ++i)

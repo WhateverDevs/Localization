@@ -43,6 +43,11 @@ namespace WhateverDevs.Localization.Runtime
         private Action<string> languageChanged;
 
         /// <summary>
+        /// Event raised when the language is changed.
+        /// </summary>
+        private Action languageChangedNoParam;
+
+        /// <summary>
         /// Cache of language Ids.
         /// </summary>
         private List<string> languageIds;
@@ -57,6 +62,8 @@ namespace WhateverDevs.Localization.Runtime
 
             if (!configurationManager.GetConfiguration(out configuration))
                 GetLogger().Error("Error retrieving localizer configuration.");
+
+            languageChanged += language => languageChangedNoParam?.Invoke();
 
             LoadValues();
 
@@ -105,10 +112,22 @@ namespace WhateverDevs.Localization.Runtime
             return "The languages are not loaded yet!!";
         }
 
+        /// <summary>
+        /// Get the localized text in the current language for the given key.
+        /// </summary>
+        /// <param name="key"></param>
         public string this[string key] => GetText(key);
 
+        /// <summary>
+        /// Get the current language key.
+        /// </summary>
+        /// <returns></returns>
         public string GetCurrentLanguage() => languagePacks[currentLanguage].Language;
 
+        /// <summary>
+        /// Get the current language Id.
+        /// </summary>
+        /// <returns></returns>
         public int GetCurrentLanguageId() => currentLanguage;
 
         /// <summary>
@@ -126,6 +145,10 @@ namespace WhateverDevs.Localization.Runtime
             return languageIds;
         }
 
+        /// <summary>
+        /// Set the current language by key.
+        /// </summary>
+        /// <param name="language"></param>
         public void SetLanguage(string language)
         {
             for (int i = 0; i < languagePacks.Count; ++i)
@@ -138,6 +161,10 @@ namespace WhateverDevs.Localization.Runtime
             Logger.Error("Language " + language + " does not exist!");
         }
 
+        /// <summary>
+        /// Set the current language by Id.
+        /// </summary>
+        /// <param name="language"></param>
         public void SetLanguage(int language)
         {
             currentLanguage = language;
@@ -157,6 +184,17 @@ namespace WhateverDevs.Localization.Runtime
         /// <summary>
         /// Subscribe to the language changed event.
         /// </summary>
-        public void SubscribeToLanguageChange(Action callback) => languageChanged += language => callback?.Invoke();
+        public void SubscribeToLanguageChange(Action callback) => languageChangedNoParam += callback;
+        
+        /// <summary>
+        /// Unsubscribe from the language changed event.
+        /// </summary>
+        /// <param name="callback"></param>
+        public void UnsubscribeFromLanguageChange(Action<string> callback) => languageChanged -= callback;
+        
+        /// <summary>
+        /// Unsubscribe from the language changed event.
+        /// </summary>
+        public void UnsubscribeFromLanguageChange(Action callback) => languageChangedNoParam -= callback;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
@@ -44,11 +45,19 @@ namespace WhateverDevs.Localization.Runtime.Ui
         [Inject]
         public ILocalizer Localizer;
 
+        /// <summary>
+        /// Set the value if on enable checked and subscribe to language change.
+        /// </summary>
         private void OnEnable()
         {
             if (SetOnEnable) OnLanguageChanged();
             Localizer.SubscribeToLanguageChange(OnLanguageChanged);
         }
+
+        /// <summary>
+        /// Unsubscribe from language change.
+        /// </summary>
+        private void OnDisable() => Localizer.UnsubscribeFromLanguageChange(OnLanguageChanged);
 
         /// <summary>
         /// Set a new value and refresh.

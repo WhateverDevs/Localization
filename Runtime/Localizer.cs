@@ -43,6 +43,11 @@ namespace WhateverDevs.Localization.Runtime
         private Action<string> languageChanged;
 
         /// <summary>
+        /// Cache of language Ids.
+        /// </summary>
+        private List<string> languageIds;
+
+        /// <summary>
         /// Init.
         /// </summary>
         [Inject]
@@ -106,6 +111,21 @@ namespace WhateverDevs.Localization.Runtime
 
         public int GetCurrentLanguageId() => currentLanguage;
 
+        /// <summary>
+        /// Retrieve all the language Ids.
+        /// </summary>
+        /// <returns>A list of all the language Ids.</returns>
+        public List<string> GetAllLanguageIds()
+        {
+            if (languageIds != null) return languageIds;
+
+            languageIds = new List<string>();
+
+            for (int i = 0; i < languagePacks.Count; ++i) languageIds.Add(languagePacks[i].Language);
+
+            return languageIds;
+        }
+
         public void SetLanguage(string language)
         {
             for (int i = 0; i < languagePacks.Count; ++i)
@@ -124,7 +144,7 @@ namespace WhateverDevs.Localization.Runtime
 
             configuration.SelectedLanguage = languagePacks[currentLanguage].Language;
             if (!configurationManager.SetConfiguration(configuration)) Logger.Error("Error saving configuration!");
-            
+
             languageChanged?.Invoke(GetCurrentLanguage());
         }
 

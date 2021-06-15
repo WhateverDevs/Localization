@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WhateverDevs.Localization.Runtime
 {
@@ -17,6 +18,12 @@ namespace WhateverDevs.Localization.Runtime
         string GetCurrentLanguage();
         
         int GetCurrentLanguageId();
+
+        /// <summary>
+        /// Retrieve all the language Ids.
+        /// </summary>
+        /// <returns>A list of all the language Ids.</returns>
+        List<string> GetAllLanguageIds();
 
         void SetLanguage(string language);
         

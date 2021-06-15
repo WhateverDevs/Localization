@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
@@ -12,6 +11,11 @@ namespace WhateverDevs.Localization.Runtime.Ui
     [RequireComponent(typeof(TMP_Text))]
     public class LocalizedTextMeshPro : LoggableMonoBehaviour<LocalizedTextMeshPro>
     {
+        /// <summary>
+        /// Should the value be set on enable?
+        /// </summary>
+        public bool SetOnEnable = true;
+
         /// <summary>
         /// Key to display.
         /// </summary>
@@ -42,8 +46,18 @@ namespace WhateverDevs.Localization.Runtime.Ui
 
         private void OnEnable()
         {
-            OnLanguageChanged();
+            if (SetOnEnable) OnLanguageChanged();
             Localizer.SubscribeToLanguageChange(OnLanguageChanged);
+        }
+
+        /// <summary>
+        /// Set a new value and refresh.
+        /// </summary>
+        /// <param name="key"></param>
+        public void SetValue(string key)
+        {
+            LocalizationKey = key;
+            OnLanguageChanged();
         }
 
         /// <summary>

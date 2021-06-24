@@ -34,7 +34,9 @@ namespace WhateverDevs.Localization.Runtime
         {
             if (Strings.ContainsKey(key)) return Strings[key];
 
-            GetLogger().Error("Bad key :" + key);
+            if (key.IsNullEmptyOrWhiteSpace()) return "";
+
+            GetLogger().Error("Bad key: " + key);
             return key;
         }
     }

@@ -108,8 +108,8 @@ namespace WhateverDevs.Localization.Runtime
         {
             if (languagesLoaded) return languagePacks[currentLanguage].GetString(key);
 
-            GetLogger().Error("The languages are not loaded yet!!");
-            return "The languages are not loaded yet!!";
+            Logger.Error("The languages are not loaded yet!");
+            return "The languages are not loaded yet!";
         }
 
         /// <summary>

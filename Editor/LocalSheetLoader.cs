@@ -56,7 +56,7 @@ namespace WhateverDevs.Localization.Editor
         /// <param name="csvData">The Sheet in CSV format</param>
         private void ParseLocalizationData(string csvData)
         {
-            List<Dictionary<string, string>> gameParametersData = CsvReader.Read(csvData);
+            List<Dictionary<string, string>> gameParametersData = CsvReader.Read(csvData, null);
 
             int col = gameParametersData[0].Count;
 

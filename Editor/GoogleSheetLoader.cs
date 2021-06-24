@@ -26,10 +26,7 @@ namespace WhateverDevs.Localization.Editor
 
         private void OnGUI()
         {
-            EditorGUILayout.HelpBox("This tool currently parses csv files, not the actual sheet.",
-                                    MessageType.Warning);
-
-            GUILayout.Label("CSV Parser", EditorStyles.boldLabel);
+            GUILayout.Label("Drive Sheet Parser", EditorStyles.boldLabel);
 
             if (configuration == null)
             {
@@ -43,6 +40,11 @@ namespace WhateverDevs.Localization.Editor
             }
 
             EditorGUILayout.HelpBox("The file in drive must be shared publicly!", MessageType.Warning);
+
+            EditorGUILayout.HelpBox("This tool downloads the file as a tsv with tab separators. "
+                                  + "If you have tabs inside your localization text you will fuck up!",
+                                    MessageType.Warning);
+
             downLoadUrl = EditorGUILayout.TextField("Url to file", downLoadUrl);
 
             deleteFileWhenFinished = EditorGUILayout.Toggle("Delete file when finished", deleteFileWhenFinished);
@@ -60,9 +62,11 @@ namespace WhateverDevs.Localization.Editor
             {
                 EditorUtility.DisplayProgressBar("Loading languages", "Downloading file...", .25f);
 
+                string sheetUrl = downLoadUrl.Replace("edit?usp=sharing", "export?format=tsv");
+
                 if (File.Exists(TemporalPath)) File.Delete(TemporalPath);
 
-                FileInfo file = DriveFileDownloader.DownloadFileFromURLToPath(downLoadUrl, TemporalPath);
+                FileInfo file = DriveFileDownloader.DownloadFileFromURLToPath(sheetUrl, TemporalPath);
 
                 EditorUtility.DisplayProgressBar("Loading languages", "Parsing file...", .5f);
 
@@ -85,7 +89,8 @@ namespace WhateverDevs.Localization.Editor
             List<SerializableDictionary<string, string>> localizationMap =
                 new List<SerializableDictionary<string, string>>();
 
-            List<Dictionary<string, string>> gameParametersData = CsvReader.Read(csvData);
+            List<Dictionary<string, string>> gameParametersData =
+                CsvReader.Read(csvData, configuration.ConfigurationData);
 
             int col = gameParametersData[0].Count;
 

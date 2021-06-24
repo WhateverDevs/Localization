@@ -7,6 +7,7 @@ namespace WhateverDevs.Localization.Editor
 {
     /// <summary>
     /// Credits to: https://gist.github.com/glockbender/4e95aafc0c544bf7e51c06c8d44e9854
+    /// And: https://stackoverflow.com/questions/33713084/download-link-for-google-spreadsheets-csv-export-with-multiple-sheets
     /// </summary>
     public static class DriveFileDownloader
     {
@@ -15,6 +16,7 @@ namespace WhateverDevs.Localization.Editor
 
         // Normal example: FileDownloader.DownloadFileFromURLToPath( "http://example.com/file/download/link", @"C:\file.txt" );
         // Drive example: FileDownloader.DownloadFileFromURLToPath( "http://drive.google.com/file/d/FILEID/view?usp=sharing", @"C:\file.txt" );
+        // Download as Tsv example: https://docs.google.com/spreadsheets/d/138bO8wfkjkVsRuBtcULuebSl0cgU1pL9fJxGIrBbuLk/export?format=tsv
         public static FileInfo DownloadFileFromURLToPath(string url, string path)
         {
             if (url.StartsWith(GoogleDriveDomain) || url.StartsWith(GoogleDriveDomain2))

@@ -1,11 +1,11 @@
 {
   "name": "whateverdevs.localization",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "Localization",
   "description": "Localization.",
   "dependencies": {
     "whateverdevs.extenject": "9.1.1",
-    "whateverdevs.core": "0.0.75"
+    "whateverdevs.core": "0.0.89"
   },
   "unity": "2020.3",
   "author": {

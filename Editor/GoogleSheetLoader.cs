@@ -9,11 +9,22 @@ using WhateverDevs.Localization.Runtime;
 namespace WhateverDevs.Localization.Editor
 {
     /// <summary>
+    /// Default implementation of the google sheet loader.
+    /// </summary>
+    public class DefaultGoogleSheetLoader : GoogleSheetsLoader<LocalizerConfigurationFile, LocalizerConfiguration>
+    {
+        [MenuItem("WhateverDevs/Localization/GoogleDrive")]
+        public static void ShowWindow() => GetWindow(typeof(DefaultGoogleSheetLoader));
+    }
+
+    /// <summary>
     ///     Class to load different Google sheets
     /// </summary>
-    public class GoogleSheetsLoader : EditorWindow
+    public abstract class GoogleSheetsLoader<TLocalizerConfigurationFile, TLocalizerConfiguration> : EditorWindow
+        where TLocalizerConfigurationFile : LocalizerConfigurationFile<TLocalizerConfiguration>, new()
+        where TLocalizerConfiguration : LocalizerConfiguration, new()
     {
-        private LocalizerConfiguration configuration;
+        private TLocalizerConfigurationFile configurationFile;
 
         private string downLoadUrl = "";
 
@@ -21,19 +32,16 @@ namespace WhateverDevs.Localization.Editor
 
         private const string TemporalPath = "Temp/LocalizationFile.csv";
 
-        [MenuItem("WhateverDevs/Localization/GoogleDrive")]
-        public static void ShowWindow() => GetWindow(typeof(GoogleSheetsLoader));
-
         private void OnGUI()
         {
             GUILayout.Label("Drive Sheet Parser", EditorStyles.boldLabel);
 
-            if (configuration == null)
+            if (configurationFile == null)
             {
-                configuration = (LocalizerConfiguration)
+                configurationFile = (TLocalizerConfigurationFile)
                     EditorGUILayout.ObjectField(new GUIContent("Configuration"),
-                                                configuration,
-                                                typeof(LocalizerConfiguration),
+                                                configurationFile,
+                                                typeof(TLocalizerConfigurationFile),
                                                 false);
 
                 return;
@@ -90,7 +98,7 @@ namespace WhateverDevs.Localization.Editor
                 new List<SerializableDictionary<string, string>>();
 
             List<Dictionary<string, string>> gameParametersData =
-                CsvReader.Read(csvData, configuration.ConfigurationData);
+                CsvReader.Read(csvData, configurationFile.ConfigurationData);
 
             int col = gameParametersData[0].Count;
 
@@ -104,7 +112,7 @@ namespace WhateverDevs.Localization.Editor
             }
 
             string folderPath = "Assets/Resources/"
-                              + configuration.ConfigurationData.LanguagePackDirectory;
+                              + configurationFile.ConfigurationData.LanguagePackDirectory;
 
             if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
 

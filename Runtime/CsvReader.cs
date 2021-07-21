@@ -13,7 +13,7 @@ namespace WhateverDevs.Localization.Runtime
         private const string LineSplitRe = @"\r\n|\n\r|\n|\r";
         private static readonly char[] TrimChars = {'\"'};
 
-        public static List<Dictionary<string, string>> Read(string file, LocalizerConfigurationData configuration)
+        public static List<Dictionary<string, string>> Read(string file, LocalizerConfiguration configuration)
         {
             List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
 

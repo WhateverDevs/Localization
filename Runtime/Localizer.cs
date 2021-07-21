@@ -15,7 +15,7 @@ namespace WhateverDevs.Localization.Runtime
         /// <summary>
         /// Configuration
         /// </summary>
-        private LocalizerConfigurationData configuration;
+        private LocalizerConfiguration configuration;
 
         /// <summary>
         /// List of all the languages

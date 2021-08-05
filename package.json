@@ -1,16 +1,15 @@
 {
   "name": "whateverdevs.localization",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "displayName": "Localization",
-  "description": "Localization.",
+  "description": "Localization package for easily displaying text in different languages.",
   "dependencies": {
     "whateverdevs.extenject": "9.1.1",
-    "whateverdevs.core": "0.0.89"
+    "whateverdevs.core": "0.0.91"
   },
-  "unity": "2020.3",
+  "unity": "2021.1",
   "author": {
     "name": "Whatever Devs",
     "url": "https://discord.gg/B8aaMzJ"
-  },
-  "unityRelease": "10f1"
+  }
 }

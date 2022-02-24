@@ -85,6 +85,8 @@ namespace WhateverDevs.Localization.Runtime.Ui
 
             modifiers = valueModifiers;
 
+            localizableModifiers = modifiersAreLocalizableKeys;
+
             OnLanguageChanged();
         }
 

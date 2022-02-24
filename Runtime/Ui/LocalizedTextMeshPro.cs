@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Ui;
@@ -27,13 +28,23 @@ namespace WhateverDevs.Localization.Runtime.Ui
         private ILocalizer localizer;
 
         /// <summary>
+        /// Are the modifiers localizable keys too?
+        /// </summary>
+        private bool localizableModifiers;
+
+        /// <summary>
+        /// Modifiers that can be applied to the display value.
+        /// </summary>
+        private string[] modifiers;
+
+        /// <summary>
         /// Retrieve the reference to the localizer.
         /// </summary>
         [Inject]
         private void Construct(ILocalizer localizerReference)
         {
             localizer = localizerReference;
-            
+
             SubscribeToLocalizer();
         }
 
@@ -63,16 +74,36 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// <summary>
         /// Set a new value and refresh.
         /// </summary>
-        /// <param name="key"></param>
-        public void SetValue(string key)
+        /// <param name="key">Key to localize.</param>
+        /// <param name="modifiersAreLocalizableKeys">Are the modifiers localizable keys too?</param>
+        /// <param name="valueModifiers">Modifiers to apply to the key, they will substitute "{number}" instances on the value.</param>
+        [Button]
+        [HideInEditorMode]
+        public void SetValue(string key, bool modifiersAreLocalizableKeys = true, params string[] valueModifiers)
         {
             LocalizationKey = key;
+
+            modifiers = valueModifiers;
+
             OnLanguageChanged();
         }
 
         /// <summary>
         /// Called every time the language changes.
         /// </summary>
-        private void OnLanguageChanged() => UpdateText(localizer[LocalizationKey]);
+        private void OnLanguageChanged()
+        {
+            string text = localizer[LocalizationKey];
+
+            if (modifiers != null)
+                for (int i = 0; i < modifiers.Length; i++)
+                {
+                    string modifier = modifiers[i];
+
+                    text = text.Replace("{" + i + "}", localizableModifiers ? localizer[modifier] : modifier);
+                }
+
+            UpdateText(text);
+        }
     }
 }

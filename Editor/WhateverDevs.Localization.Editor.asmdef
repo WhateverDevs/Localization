@@ -1,6 +1,6 @@
 {
     "name": "WhateverDevs.Localization.Editor",
-    "rootNamespace": "",
+    "rootNamespace": "WhateverDevs.Localization.Editor",
     "references": [
         "GUID:aae4add5d5c67aa4d93b523bec04893b",
         "GUID:6f75e3e9b2be11e40a79ad3ceec60e41"

@@ -24,8 +24,18 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// <summary>
         /// Reference to the localizer.
         /// </summary>
+        private ILocalizer localizer;
+
+        /// <summary>
+        /// Retrieve the reference to the localizer.
+        /// </summary>
         [Inject]
-        public ILocalizer Localizer;
+        private void Construct(ILocalizer localizerReference)
+        {
+            localizer = localizerReference;
+            
+            SubscribeToLocalizer();
+        }
 
         /// <summary>
         /// Set the value if on enable checked and subscribe to language change.
@@ -33,13 +43,22 @@ namespace WhateverDevs.Localization.Runtime.Ui
         private void OnEnable()
         {
             if (SetOnEnable) OnLanguageChanged();
-            Localizer.SubscribeToLanguageChange(OnLanguageChanged);
+            SubscribeToLocalizer();
+        }
+
+        /// <summary>
+        /// Subscribe to the localizer changes.
+        /// </summary>
+        private void SubscribeToLocalizer()
+        {
+            localizer?.UnsubscribeFromLanguageChange(OnLanguageChanged);
+            localizer?.SubscribeToLanguageChange(OnLanguageChanged);
         }
 
         /// <summary>
         /// Unsubscribe from language change.
         /// </summary>
-        private void OnDisable() => Localizer.UnsubscribeFromLanguageChange(OnLanguageChanged);
+        private void OnDisable() => localizer.UnsubscribeFromLanguageChange(OnLanguageChanged);
 
         /// <summary>
         /// Set a new value and refresh.
@@ -54,6 +73,6 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// <summary>
         /// Called every time the language changes.
         /// </summary>
-        private void OnLanguageChanged() => UpdateText(Localizer[LocalizationKey]);
+        private void OnLanguageChanged() => UpdateText(localizer[LocalizationKey]);
     }
 }

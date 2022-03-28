@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using WhateverDevs.Core.Editor.Utils;
 using WhateverDevs.Core.Runtime.DataStructures;
 using WhateverDevs.Localization.Runtime;
 
@@ -31,6 +33,19 @@ namespace WhateverDevs.Localization.Editor
         private bool deleteFileWhenFinished = true;
 
         private const string TemporalPath = "Temp/LocalizationFile.csv";
+
+        private void OnEnable()
+        {
+            try
+            {
+                EditorUtility.DisplayProgressBar("Localization", "Looking for configuration...", .5f);
+                configurationFile = AssetManagementUtils.FindAssetsByType<TLocalizerConfigurationFile>().First();
+            }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
+        }
 
         private void OnGUI()
         {

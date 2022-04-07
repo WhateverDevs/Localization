@@ -24,7 +24,7 @@ namespace WhateverDevs.Localization.Editor
 
         private string destinationPath = "Assets/Resources/Languages/";
 
-        [MenuItem("WhateverDevs/Localization/LocalFile")]
+        //[MenuItem("WhateverDevs/Localization/LocalFile")]
         public static void ShowWindow() => GetWindow(typeof(LocalSheetLoader));
 
         private void OnGUI()

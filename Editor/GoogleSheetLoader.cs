@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -16,7 +15,7 @@ namespace WhateverDevs.Localization.Editor
     public class DefaultGoogleSheetLoader : GoogleSheetsLoader<LocalizerConfigurationFile, LocalizerConfiguration>
     {
         [MenuItem("WhateverDevs/Localization/GoogleDrive")]
-        public static void ShowWindow() => GetWindow(typeof(DefaultGoogleSheetLoader));
+        public static void ShowWindow() => GetWindow(typeof(DefaultGoogleSheetLoader), false, "Drive Sheet Parser");
     }
 
     /// <summary>
@@ -36,6 +35,8 @@ namespace WhateverDevs.Localization.Editor
 
         private void OnEnable()
         {
+            downLoadUrl = EditorGUIUtility.systemCopyBuffer;
+
             try
             {
                 EditorUtility.DisplayProgressBar("Localization", "Looking for configuration...", .5f);
@@ -49,8 +50,6 @@ namespace WhateverDevs.Localization.Editor
 
         private void OnGUI()
         {
-            GUILayout.Label("Drive Sheet Parser", EditorStyles.boldLabel);
-
             if (configurationFile == null)
             {
                 configurationFile = (TLocalizerConfigurationFile)

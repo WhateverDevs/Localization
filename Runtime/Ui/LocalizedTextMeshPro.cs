@@ -1,8 +1,10 @@
-using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Ui;
 using Zenject;
+#if ODIN_INSPECTOR_3
+using Sirenix.OdinInspector;
+#endif
 
 namespace WhateverDevs.Localization.Runtime.Ui
 {
@@ -77,8 +79,10 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// <param name="key">Key to localize.</param>
         /// <param name="modifiersAreLocalizableKeys">Are the modifiers localizable keys too?</param>
         /// <param name="valueModifiers">Modifiers to apply to the key, they will substitute "{number}" instances on the value.</param>
+        #if ODIN_INSPECTOR_3
         [Button]
         [HideInEditorMode]
+        #endif
         public void SetValue(string key, bool modifiersAreLocalizableKeys = true, params string[] valueModifiers)
         {
             LocalizationKey = key;

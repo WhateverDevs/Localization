@@ -27,17 +27,17 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// <summary>
         /// Reference to the localizer.
         /// </summary>
-        private ILocalizer localizer;
+        protected ILocalizer Localizer;
 
         /// <summary>
         /// Are the modifiers localizable keys too?
         /// </summary>
-        private bool localizableModifiers;
+        protected bool LocalizableModifiers;
 
         /// <summary>
         /// Modifiers that can be applied to the display value.
         /// </summary>
-        private string[] modifiers;
+        protected string[] Modifiers;
 
         /// <summary>
         /// Retrieve the reference to the localizer.
@@ -45,7 +45,7 @@ namespace WhateverDevs.Localization.Runtime.Ui
         [Inject]
         private void Construct(ILocalizer localizerReference)
         {
-            localizer = localizerReference;
+            Localizer = localizerReference;
 
             SubscribeToLocalizer();
         }
@@ -64,14 +64,14 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// </summary>
         private void SubscribeToLocalizer()
         {
-            localizer?.UnsubscribeFromLanguageChange(OnLanguageChanged);
-            localizer?.SubscribeToLanguageChange(OnLanguageChanged);
+            Localizer?.UnsubscribeFromLanguageChange(OnLanguageChanged);
+            Localizer?.SubscribeToLanguageChange(OnLanguageChanged);
         }
 
         /// <summary>
         /// Unsubscribe from language change.
         /// </summary>
-        private void OnDisable() => localizer.UnsubscribeFromLanguageChange(OnLanguageChanged);
+        private void OnDisable() => Localizer.UnsubscribeFromLanguageChange(OnLanguageChanged);
 
         /// <summary>
         /// Set a new value and refresh.
@@ -83,13 +83,13 @@ namespace WhateverDevs.Localization.Runtime.Ui
         [Button]
         [HideInEditorMode]
         #endif
-        public void SetValue(string key, bool modifiersAreLocalizableKeys = true, params string[] valueModifiers)
+        public virtual void SetValue(string key, bool modifiersAreLocalizableKeys = true, params string[] valueModifiers)
         {
             LocalizationKey = key;
 
-            modifiers = valueModifiers;
+            Modifiers = valueModifiers;
 
-            localizableModifiers = modifiersAreLocalizableKeys;
+            LocalizableModifiers = modifiersAreLocalizableKeys;
 
             OnLanguageChanged();
         }
@@ -97,16 +97,16 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// <summary>
         /// Called every time the language changes.
         /// </summary>
-        private void OnLanguageChanged()
+        protected void OnLanguageChanged()
         {
-            string text = localizer[LocalizationKey];
+            string text = Localizer[LocalizationKey];
 
-            if (modifiers != null)
-                for (int i = 0; i < modifiers.Length; i++)
+            if (Modifiers != null)
+                for (int i = 0; i < Modifiers.Length; i++)
                 {
-                    string modifier = modifiers[i];
+                    string modifier = Modifiers[i];
 
-                    text = text.Replace("{" + i + "}", localizableModifiers ? localizer[modifier] : modifier);
+                    text = text.Replace("{" + i + "}", LocalizableModifiers ? Localizer[modifier] : modifier);
                 }
 
             UpdateText(text);

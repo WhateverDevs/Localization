@@ -14,7 +14,7 @@ namespace WhateverDevs.Localization.Editor
     /// </summary>
     public class DefaultGoogleSheetLoader : GoogleSheetsLoader<LocalizerConfigurationFile, LocalizerConfiguration>
     {
-        [MenuItem("WhateverDevs/Localization/GoogleDrive")]
+        [MenuItem("WhateverDevs/Localization/GoogleDrive #&l")]
         public static void ShowWindow() => GetWindow(typeof(DefaultGoogleSheetLoader), false, "Drive Sheet Parser");
     }
 

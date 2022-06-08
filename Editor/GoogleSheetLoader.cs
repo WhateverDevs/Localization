@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Sirenix.Utilities;
 using UnityEditor;
 using UnityEngine;
 using WhateverDevs.Core.Editor.Utils;
@@ -108,8 +109,7 @@ namespace WhateverDevs.Localization.Editor
         /// <param name="csvData">The Sheet in CSV format</param>
         private void ParseLocalizationData(string csvData)
         {
-            List<SerializableDictionary<string, string>> localizationMap =
-                new List<SerializableDictionary<string, string>>();
+            List<SerializableDictionary<string, string>> localizationMap = new();
 
             List<Dictionary<string, string>> gameParametersData =
                 CsvReader.Read(csvData, configurationFile.ConfigurationData);
@@ -132,6 +132,8 @@ namespace WhateverDevs.Localization.Editor
 
             for (int i = 0; i < col - 1; ++i)
             {
+                if (gameParametersData[0].ElementAt(i + 1).Key.IsNullOrWhitespace()) continue;
+
                 ScriptableLanguage asset = CreateInstance<ScriptableLanguage>();
 
                 AssetDatabase.CreateAsset(asset,
@@ -146,10 +148,6 @@ namespace WhateverDevs.Localization.Editor
                 AssetDatabase.SaveAssets();
 
                 AssetDatabase.Refresh();
-
-                EditorUtility.FocusProjectWindow();
-
-                Selection.activeObject = asset;
             }
         }
     }

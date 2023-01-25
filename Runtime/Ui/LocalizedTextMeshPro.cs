@@ -43,12 +43,7 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// Retrieve the reference to the localizer.
         /// </summary>
         [Inject]
-        private void Construct(ILocalizer localizerReference)
-        {
-            Localizer = localizerReference;
-
-            SubscribeToLocalizer();
-        }
+        private void Construct(ILocalizer localizerReference) => Localizer = localizerReference;
 
         /// <summary>
         /// Set the value if on enable checked and subscribe to language change.

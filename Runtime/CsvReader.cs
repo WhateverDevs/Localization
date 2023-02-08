@@ -11,11 +11,11 @@ namespace WhateverDevs.Localization.Runtime
     public class CsvReader
     {
         private const string LineSplitRe = @"\r\n|\n\r|\n|\r";
-        private static readonly char[] TrimChars = {'\"'};
+        private static readonly char[] TrimChars = { '\"' };
 
         public static List<Dictionary<string, string>> Read(string file, LocalizerConfiguration configuration)
         {
-            List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
+            List<Dictionary<string, string>> list = new();
 
             string[] lines = Regex.Split(file, LineSplitRe);
 
@@ -28,14 +28,14 @@ namespace WhateverDevs.Localization.Runtime
                 string[] values = Regex.Split(lines[i], configuration.Separator);
                 if (values.Length == 0 || values[0] == "") continue;
 
-                Dictionary<string, string> entry = new Dictionary<string, string>();
+                Dictionary<string, string> entry = new();
 
                 for (int j = 0; j < header.Length && j < values.Length; ++j)
                 {
                     string value = values[j];
                     value = value.TrimStart(TrimChars).TrimEnd(TrimChars).Replace("\\", "");
-                    string finalValue = value;
-                    entry[header[j]] = finalValue;
+                    value = value.Replace("{LineBreak}", "\n");
+                    entry[header[j]] = value;
                 }
 
                 list.Add(entry);

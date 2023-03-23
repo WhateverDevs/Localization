@@ -48,7 +48,7 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// <summary>
         /// Set the value if on enable checked and subscribe to language change.
         /// </summary>
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             if (SetOnEnable) OnLanguageChanged();
             SubscribeToLocalizer();
@@ -66,7 +66,7 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// <summary>
         /// Unsubscribe from language change.
         /// </summary>
-        private void OnDisable() => Localizer.UnsubscribeFromLanguageChange(OnLanguageChanged);
+        protected virtual void OnDisable() => Localizer.UnsubscribeFromLanguageChange(OnLanguageChanged);
 
         /// <summary>
         /// Set a new value and refresh.
@@ -78,7 +78,9 @@ namespace WhateverDevs.Localization.Runtime.Ui
         [Button]
         [HideInEditorMode]
         #endif
-        public virtual void SetValue(string key, bool modifiersAreLocalizableKeys = true, params string[] valueModifiers)
+        public virtual void SetValue(string key,
+                                     bool modifiersAreLocalizableKeys = true,
+                                     params string[] valueModifiers)
         {
             LocalizationKey = key;
 
@@ -92,7 +94,7 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// <summary>
         /// Called every time the language changes.
         /// </summary>
-        protected void OnLanguageChanged()
+        protected virtual void OnLanguageChanged()
         {
             string text = Localizer[LocalizationKey];
 

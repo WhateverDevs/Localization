@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
 using WhateverDevs.Core.Runtime.Configuration;
@@ -20,7 +21,7 @@ namespace WhateverDevs.Localization.Runtime
         /// <summary>
         /// List of all the languages
         /// </summary>
-        private readonly List<LanguagePack> languagePacks = new List<LanguagePack>();
+        private readonly List<LanguagePack> languagePacks = new();
 
         /// <summary>
         /// Flag to know
@@ -63,7 +64,7 @@ namespace WhateverDevs.Localization.Runtime
             if (!configurationManager.GetConfiguration(out configuration))
                 GetLogger().Error("Error retrieving localizer configuration.");
 
-            languageChanged += language => languageChangedNoParam?.Invoke();
+            languageChanged += _ => languageChangedNoParam?.Invoke();
 
             LoadValues();
 
@@ -86,7 +87,7 @@ namespace WhateverDevs.Localization.Runtime
 
                 if (tempScript == null) continue;
 
-                LanguagePack temp = new LanguagePack {Language = tempScript.name};
+                LanguagePack temp = new LanguagePack { Language = tempScript.name };
 
                 for (int j = 0; j < tempScript.Language.Count; ++j)
                 {
@@ -102,33 +103,109 @@ namespace WhateverDevs.Localization.Runtime
         }
 
         /// <summary>
-        /// Getting the value for a key in the current language
+        /// Get the localized text in the current language for the given key.
         /// </summary>
-        public string GetText(string key)
+        /// <param name="key">Key to retrieve.</param>
+        public string this[string key] => GetText(key);
+
+        /// <summary>
+        /// Get the localized text in the current language for the given key.
+        /// </summary>
+        /// <param name="key">Key to retrieve.</param>
+        public string GetText(string key) => GetText(key, currentLanguage);
+
+        /// <summary>
+        /// Get the localized text in the given language for the given key.
+        /// </summary>
+        /// <param name="key">Key to retrieve.</param>
+        /// <param name="language">Language to retrieve it from.</param>
+        /// <returns></returns>
+        public string GetText(string key, string language) => GetText(key, GetLanguageIndex(language));
+
+        /// <summary>
+        /// Get the localized text in the given language for the given key.
+        /// </summary>
+        /// <param name="key">Key to retrieve.</param>
+        /// <param name="languageIndex">Language to retrieve it from.</param>
+        /// <returns></returns>
+        public string GetText(string key, int languageIndex)
         {
-            if (languagesLoaded) return languagePacks[currentLanguage].GetString(key);
+            if (languagesLoaded) return languagePacks[languageIndex].GetString(key);
 
             Logger.Error("The languages are not loaded yet!");
             return "The languages are not loaded yet!";
         }
 
         /// <summary>
-        /// Get the localized text in the current language for the given key.
+        /// Get a list of localized texts in the current language for the given keys.
         /// </summary>
-        /// <param name="key"></param>
-        public string this[string key] => GetText(key);
+        /// <param name="keys">Keys to retrieve.</param>
+        /// <returns>A list of the localized texts.</returns>
+        public List<string> GetTexts(List<string> keys) => keys.Select(key => GetText(key)).ToList();
+
+        /// <summary>
+        /// Get a list of localized texts in the given language for the given keys.
+        /// </summary>
+        /// <param name="keys">Keys to retrieve.</param>
+        /// <param name="language">Language to retrieve them from.</param>
+        /// <returns>A list of the localized texts.</returns>
+        public List<string> GetTexts(List<string> keys, string language) =>
+            keys.Select(key => GetText(key, GetLanguageIndex(language))).ToList();
+
+        /// <summary>
+        /// Get a list of localized texts in the given language for the given keys.
+        /// </summary>
+        /// <param name="keys">Keys to retrieve.</param>
+        /// <param name="languageIndex">Language to retrieve them from.</param>
+        /// <returns>A list of the localized texts.</returns>
+        public List<string> GetTexts(List<string> keys, int languageIndex) =>
+            keys.Select(key => GetText(key, languageIndex)).ToList();
+
+        /// <summary>
+        /// Get a list of localized texts in the given languages for the given keys.
+        /// </summary>
+        /// <param name="keys">Keys to retrieve.</param>
+        /// <param name="languages">Languages to retrieve them from.</param>
+        /// <returns>A dictionary with the language as the key and a list of the localized texts as the value.</returns>
+        public Dictionary<string, List<string>> GetTexts(List<string> keys, List<string> languages) =>
+            languages.ToDictionary(language => language, language => GetTexts(keys, language));
+
+        /// <summary>
+        /// Get a list of localized texts in the given languages for the given keys.
+        /// </summary>
+        /// <param name="keys">Keys to retrieve.</param>
+        /// <param name="languageIndexes">Languages to retrieve them from.</param>
+        /// <returns>A dictionary with the language as the key and a list of the localized texts as the value.</returns>
+        public Dictionary<string, List<string>> GetTexts(List<string> keys, List<int> languageIndexes) =>
+            languageIndexes.ToDictionary(index => languagePacks[index].Language, index => GetTexts(keys, index));
 
         /// <summary>
         /// Get the current language key.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A localizable string key for the name of the current language.</returns>
         public string GetCurrentLanguage() => languagePacks[currentLanguage].Language;
 
         /// <summary>
-        /// Get the current language Id.
+        /// Get the current language index.
         /// </summary>
-        /// <returns></returns>
-        public int GetCurrentLanguageId() => currentLanguage;
+        /// <returns>The index of the current language.</returns>
+        public int GetCurrentLanguageIndex() => currentLanguage;
+
+        /// <summary>
+        /// Get the index of the given language key.
+        /// </summary>
+        /// <param name="language">Language to get.</param>
+        /// <returns>Its index.</returns>
+        public int GetLanguageIndex(string language)
+        {
+            for (int i = 0; i < languagePacks.Count; ++i)
+                if (languagePacks[i].Language == language)
+                    return i;
+
+            Logger.Error("Language " + language + " does not exist!");
+
+            return -1;
+        }
 
         /// <summary>
         /// Retrieve all the language Ids.
@@ -148,7 +225,7 @@ namespace WhateverDevs.Localization.Runtime
         /// <summary>
         /// Set the current language by key.
         /// </summary>
-        /// <param name="language"></param>
+        /// <param name="language">Language to set.</param>
         public void SetLanguage(string language)
         {
             for (int i = 0; i < languagePacks.Count; ++i)
@@ -162,9 +239,9 @@ namespace WhateverDevs.Localization.Runtime
         }
 
         /// <summary>
-        /// Set the current language by Id.
+        /// Set the current language by index.
         /// </summary>
-        /// <param name="language"></param>
+        /// <param name="language">Language to set.</param>
         public void SetLanguage(int language)
         {
             currentLanguage = language;
@@ -178,23 +255,25 @@ namespace WhateverDevs.Localization.Runtime
         /// <summary>
         /// Subscribe to the language changed event.
         /// </summary>
-        /// <param name="callback"></param>
+        /// <param name="callback">Called each time the language changes.</param>
         public void SubscribeToLanguageChange(Action<string> callback) => languageChanged += callback;
 
         /// <summary>
         /// Subscribe to the language changed event.
         /// </summary>
+        /// <param name="callback">Called each time the language changes.</param>
         public void SubscribeToLanguageChange(Action callback) => languageChangedNoParam += callback;
-        
+
         /// <summary>
         /// Unsubscribe from the language changed event.
         /// </summary>
-        /// <param name="callback"></param>
+        /// <param name="callback">Callback to unsubscribe.</param>
         public void UnsubscribeFromLanguageChange(Action<string> callback) => languageChanged -= callback;
-        
+
         /// <summary>
         /// Unsubscribe from the language changed event.
         /// </summary>
+        /// <param name="callback">Callback to unsubscribe.</param>
         public void UnsubscribeFromLanguageChange(Action callback) => languageChangedNoParam -= callback;
     }
 }

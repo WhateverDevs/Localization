@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using WhateverDevs.Core.Runtime.Build;
-using WhateverDevs.Localization.Runtime;
 
 namespace WhateverDevs.Localization.Editor.BuildHooks
 {
@@ -17,16 +16,16 @@ namespace WhateverDevs.Localization.Editor.BuildHooks
         public string Url;
 
         /// <summary>
-        /// Reference to the configuration file.
+        /// Directory in which to output the localization (inside assets).
         /// </summary>
-        public LocalizerConfigurationFile LocalizationConfigurationFile;
+        public string OutputDirectory = "Languages/";
 
         /// <summary>
         /// Load the languages.
         /// </summary>
         public override bool RunHook(string buildPath)
         {
-            GoogleSheetLoader.LoadLanguages(Url, LocalizationConfigurationFile.ConfigurationData.LanguagePackDirectory);
+            GoogleSheetLoader.LoadLanguages(Url, OutputDirectory);
             return true;
         }
     }

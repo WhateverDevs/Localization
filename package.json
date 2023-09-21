@@ -1,6 +1,6 @@
 {
   "name": "whateverdevs.localization",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "displayName": "Localization",
   "description": "Localization package for easily displaying text in different languages.",
   "dependencies": {
@@ -10,6 +10,6 @@
   "unity": "2021.1",
   "author": {
     "name": "Whatever Devs",
-    "url": "https://discord.gg/B8aaMzJ"
+    "url": "https://github.com/WhateverDevs"
   }
 }

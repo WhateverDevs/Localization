@@ -9,7 +9,7 @@ using WhateverDevs.Localization.Runtime;
 namespace WhateverDevs.Localization.Editor
 {
     /// <summary>
-    ///     GoogleSheetsLoader from a SpreadSheet to a List of Localizer.Pair
+    ///     GoogleSheetsLoaderWindow from a SpreadSheet to a List of Localizer.Pair
     /// </summary>
     public class LocalSheetLoader : EditorWindow
     {

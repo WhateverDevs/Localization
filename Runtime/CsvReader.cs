@@ -13,7 +13,7 @@ namespace WhateverDevs.Localization.Runtime
         private const string LineSplitRe = @"\r\n|\n\r|\n|\r";
         private static readonly char[] TrimChars = { '\"' };
 
-        public static List<Dictionary<string, string>> Read(string file, LocalizerConfiguration configuration)
+        public static List<Dictionary<string, string>> Read(string file, string separator)
         {
             List<Dictionary<string, string>> list = new();
 
@@ -21,11 +21,11 @@ namespace WhateverDevs.Localization.Runtime
 
             if (lines.Length <= 1) return list;
 
-            string[] header = Regex.Split(lines[0], configuration.Separator);
+            string[] header = Regex.Split(lines[0], separator);
 
             for (int i = 1; i < lines.Length; ++i)
             {
-                string[] values = Regex.Split(lines[i], configuration.Separator);
+                string[] values = Regex.Split(lines[i], separator);
                 if (values.Length == 0 || values[0] == "") continue;
 
                 Dictionary<string, string> entry = new();

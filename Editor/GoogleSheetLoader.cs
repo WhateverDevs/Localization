@@ -4,88 +4,39 @@ using System.Linq;
 using Sirenix.Utilities;
 using UnityEditor;
 using UnityEngine;
-using WhateverDevs.Core.Editor.Utils;
 using WhateverDevs.Core.Runtime.DataStructures;
 using WhateverDevs.Localization.Runtime;
 
 namespace WhateverDevs.Localization.Editor
 {
     /// <summary>
-    /// Default implementation of the google sheet loader.
+    /// Class to load different Google sheets.
     /// </summary>
-    public class DefaultGoogleSheetLoader : GoogleSheetsLoader<LocalizerConfigurationFile, LocalizerConfiguration>
+    public class GoogleSheetLoader
     {
-        [MenuItem("WhateverDevs/Localization/GoogleDrive #&l")]
-        public static void ShowWindow() => GetWindow(typeof(DefaultGoogleSheetLoader), false, "Drive Sheet Parser");
-    }
-
-    /// <summary>
-    ///     Class to load different Google sheets
-    /// </summary>
-    public abstract class GoogleSheetsLoader<TLocalizerConfigurationFile, TLocalizerConfiguration> : EditorWindow
-        where TLocalizerConfigurationFile : LocalizerConfigurationFile<TLocalizerConfiguration>, new()
-        where TLocalizerConfiguration : LocalizerConfiguration, new()
-    {
-        private TLocalizerConfigurationFile configurationFile;
-
-        private string downLoadUrl = "";
-
-        private bool deleteFileWhenFinished = true;
-
+        /// <summary>
+        /// Temp path for the downloaded file.
+        /// </summary>
         private const string TemporalPath = "Temp/LocalizationFile.csv";
 
-        private void OnEnable()
-        {
-            downLoadUrl = EditorGUIUtility.systemCopyBuffer;
-
-            try
-            {
-                EditorUtility.DisplayProgressBar("Localization", "Looking for configuration...", .5f);
-                configurationFile = AssetManagementUtils.FindAssetsByType<TLocalizerConfigurationFile>().First();
-            }
-            finally
-            {
-                EditorUtility.ClearProgressBar();
-            }
-        }
-
-        private void OnGUI()
-        {
-            if (configurationFile == null)
-            {
-                configurationFile = (TLocalizerConfigurationFile)
-                    EditorGUILayout.ObjectField(new GUIContent("Configuration"),
-                                                configurationFile,
-                                                typeof(TLocalizerConfigurationFile),
-                                                false);
-
-                return;
-            }
-
-            EditorGUILayout.HelpBox("The file in drive must be shared publicly!", MessageType.Warning);
-
-            EditorGUILayout.HelpBox("This tool downloads the file as a tsv with tab separators. "
-                                  + "If you have tabs inside your localization text you will fuck up!",
-                                    MessageType.Warning);
-
-            downLoadUrl = EditorGUILayout.TextField("Url to file", downLoadUrl);
-
-            deleteFileWhenFinished = EditorGUILayout.Toggle("Delete file when finished", deleteFileWhenFinished);
-
-            if (GUILayout.Button("Download and Parse")) LoadLanguages();
-        }
+        /// <summary>
+        /// Separator to use with Google Sheets.
+        /// </summary>
+        private const string Separator = "\t";
 
         /// <summary>
-        ///     Load Languages
+        /// Load the languages from a Google Sheet.
         /// </summary>
-        /// <returns>IEnumerator</returns>
-        private void LoadLanguages()
+        /// <param name="url">Sheet url.</param>
+        /// <param name="outputDirectory">Folder in which to save the languages.</param>
+        /// <param name="deleteFileWhenFinished">Delete the temporal files when finished?</param>
+        public static void LoadLanguages(string url, string outputDirectory, bool deleteFileWhenFinished = true)
         {
             try
             {
                 EditorUtility.DisplayProgressBar("Loading languages", "Downloading file...", .25f);
 
-                string sheetUrl = downLoadUrl.Replace("edit?usp=sharing", "export?format=tsv");
+                string sheetUrl = url.Replace("edit?usp=sharing", "export?format=tsv");
 
                 if (File.Exists(TemporalPath)) File.Delete(TemporalPath);
 
@@ -93,7 +44,7 @@ namespace WhateverDevs.Localization.Editor
 
                 EditorUtility.DisplayProgressBar("Loading languages", "Parsing file...", .5f);
 
-                ParseLocalizationData(File.ReadAllText(file.FullName));
+                ParseLocalizationData(File.ReadAllText(file.FullName), outputDirectory);
 
                 if (deleteFileWhenFinished) file.Delete();
             }
@@ -104,15 +55,16 @@ namespace WhateverDevs.Localization.Editor
         }
 
         /// <summary>
-        ///     Parses the CSV formatted Sheet
+        /// Parses the TSV formatted Sheet.
         /// </summary>
-        /// <param name="csvData">The Sheet in CSV format</param>
-        private void ParseLocalizationData(string csvData)
+        /// <param name="csvData">The Sheet in TSV format</param>
+        /// <param name="directory">Directory in which to save the languages.</param>
+        private static void ParseLocalizationData(string csvData, string directory)
         {
             List<SerializableDictionary<string, string>> localizationMap = new();
 
             List<Dictionary<string, string>> gameParametersData =
-                CsvReader.Read(csvData, configurationFile.ConfigurationData);
+                CsvReader.Read(csvData, Separator);
 
             int col = gameParametersData[0].Count;
 
@@ -125,8 +77,7 @@ namespace WhateverDevs.Localization.Editor
                         gameParametersData[i].ElementAt(j).Value;
             }
 
-            string folderPath = "Assets/Resources/"
-                              + configurationFile.ConfigurationData.LanguagePackDirectory;
+            string folderPath = "Assets/Resources/" + directory;
 
             if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
 
@@ -134,7 +85,7 @@ namespace WhateverDevs.Localization.Editor
             {
                 if (gameParametersData[0].ElementAt(i + 1).Key.IsNullOrWhitespace()) continue;
 
-                ScriptableLanguage asset = CreateInstance<ScriptableLanguage>();
+                ScriptableLanguage asset = ScriptableObject.CreateInstance<ScriptableLanguage>();
 
                 AssetDatabase.CreateAsset(asset,
                                           folderPath

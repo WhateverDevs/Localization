@@ -33,7 +33,5 @@ namespace WhateverDevs.Localization.Runtime
         public string SelectedLanguage;
 
         public string LanguagePackDirectory = "Languages/";
-
-        public string Separator = "\t";
     }
 }

@@ -12,29 +12,45 @@ namespace WhateverDevs.Localization.Runtime
         /// Get the localized text in the current language for the given key.
         /// </summary>
         /// <param name="key">Key to retrieve.</param>
-        string this[string key] { get; }
+        /// <param name="modifiersAreLocalizableKeys">Are the modifiers localizable keys too?</param>
+        /// <param name="valueModifiers">Modifiers to apply to the key, they will substitute "{number}" instances on the value.</param>
+        string this[string key,
+                    bool modifiersAreLocalizableKeys = true,
+                    params string[] valueModifiers] { get; }
 
         /// <summary>
         /// Get the localized text in the current language for the given key.
         /// </summary>
         /// <param name="key">Key to retrieve.</param>
-        string GetText(string key);
+        /// <param name="modifiersAreLocalizableKeys">Are the modifiers localizable keys too?</param>
+        /// <param name="valueModifiers">Modifiers to apply to the key, they will substitute "{number}" instances on the value.</param>
+        string GetText(string key,
+                       bool modifiersAreLocalizableKeys = true,
+                       params string[] valueModifiers);
 
         /// <summary>
         /// Get the localized text in the given language for the given key.
         /// </summary>
         /// <param name="key">Key to retrieve.</param>
         /// <param name="language">Language to retrieve it from.</param>
-        /// <returns></returns>
-        string GetText(string key, string language);
-        
+        /// <param name="modifiersAreLocalizableKeys">Are the modifiers localizable keys too?</param>
+        /// <param name="valueModifiers">Modifiers to apply to the key, they will substitute "{number}" instances on the value.</param>
+        string GetText(string key,
+                       string language,
+                       bool modifiersAreLocalizableKeys = true,
+                       params string[] valueModifiers);
+
         /// <summary>
         /// Get the localized text in the given language for the given key.
         /// </summary>
         /// <param name="key">Key to retrieve.</param>
         /// <param name="languageIndex">Language to retrieve it from.</param>
-        /// <returns></returns>
-        string GetText(string key, int languageIndex);
+        /// <param name="modifiersAreLocalizableKeys">Are the modifiers localizable keys too?</param>
+        /// <param name="valueModifiers">Modifiers to apply to the key, they will substitute "{number}" instances on the value.</param>
+        string GetText(string key,
+                       int languageIndex,
+                       bool modifiersAreLocalizableKeys = true,
+                       params string[] valueModifiers);
 
         /// <summary>
         /// Get a list of localized texts in the current language for the given keys.
@@ -50,7 +66,7 @@ namespace WhateverDevs.Localization.Runtime
         /// <param name="language">Language to retrieve them from.</param>
         /// <returns>A list of the localized texts.</returns>
         List<string> GetTexts(List<string> keys, string language);
-        
+
         /// <summary>
         /// Get a list of localized texts in the given language for the given keys.
         /// </summary>
@@ -66,7 +82,7 @@ namespace WhateverDevs.Localization.Runtime
         /// <param name="languages">Languages to retrieve them from.</param>
         /// <returns>A dictionary with the language as the key and a list of the localized texts as the value.</returns>
         Dictionary<string, List<string>> GetTexts(List<string> keys, List<string> languages);
-        
+
         /// <summary>
         /// Get a list of localized texts in the given languages for the given keys.
         /// </summary>
@@ -86,7 +102,7 @@ namespace WhateverDevs.Localization.Runtime
         /// </summary>
         /// <returns>The index of the current language.</returns>
         int GetCurrentLanguageIndex();
-        
+
         /// <summary>
         /// Get the index of the given language key.
         /// </summary>

@@ -94,19 +94,7 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// <summary>
         /// Called every time the language changes.
         /// </summary>
-        protected virtual void OnLanguageChanged()
-        {
-            string text = Localizer[LocalizationKey];
-
-            if (Modifiers != null)
-                for (int i = 0; i < Modifiers.Length; i++)
-                {
-                    string modifier = Modifiers[i];
-
-                    text = text.Replace("{" + i + "}", LocalizableModifiers ? Localizer[modifier] : modifier);
-                }
-
-            UpdateText(text);
-        }
+        protected virtual void OnLanguageChanged() =>
+            UpdateText(Localizer[LocalizationKey, LocalizableModifiers, Modifiers]);
     }
 }

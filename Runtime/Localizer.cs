@@ -107,34 +107,81 @@ namespace WhateverDevs.Localization.Runtime
         /// Get the localized text in the current language for the given key.
         /// </summary>
         /// <param name="key">Key to retrieve.</param>
-        public string this[string key] => GetText(key);
+        /// <param name="modifiersAreLocalizableKeys">Are the modifiers localizable keys too?</param>
+        /// <param name="valueModifiers">Modifiers to apply to the key, they will substitute "{number}" instances on the value.</param>
+        public string this[string key,
+                           bool modifiersAreLocalizableKeys = true,
+                           params string[] valueModifiers] =>
+            GetText(key, modifiersAreLocalizableKeys, valueModifiers);
 
         /// <summary>
         /// Get the localized text in the current language for the given key.
         /// </summary>
         /// <param name="key">Key to retrieve.</param>
-        public string GetText(string key) => GetText(key, currentLanguage);
+        /// <param name="modifiersAreLocalizableKeys">Are the modifiers localizable keys too?</param>
+        /// <param name="valueModifiers">Modifiers to apply to the key, they will substitute "{number}" instances on the value.</param>
+        public string GetText(string key,
+                              bool modifiersAreLocalizableKeys = true,
+                              params string[] valueModifiers) =>
+            GetText(key, currentLanguage, modifiersAreLocalizableKeys, valueModifiers);
 
         /// <summary>
         /// Get the localized text in the given language for the given key.
         /// </summary>
         /// <param name="key">Key to retrieve.</param>
         /// <param name="language">Language to retrieve it from.</param>
-        /// <returns></returns>
-        public string GetText(string key, string language) => GetText(key, GetLanguageIndex(language));
+        /// <param name="modifiersAreLocalizableKeys">Are the modifiers localizable keys too?</param>
+        /// <param name="valueModifiers">Modifiers to apply to the key, they will substitute "{number}" instances on the value.</param>
+        public string GetText(string key,
+                              string language,
+                              bool modifiersAreLocalizableKeys = true,
+                              params string[] valueModifiers) =>
+            GetText(key, GetLanguageIndex(language), modifiersAreLocalizableKeys, valueModifiers);
 
         /// <summary>
         /// Get the localized text in the given language for the given key.
         /// </summary>
         /// <param name="key">Key to retrieve.</param>
         /// <param name="languageIndex">Language to retrieve it from.</param>
-        /// <returns></returns>
-        public string GetText(string key, int languageIndex)
+        /// <param name="modifiersAreLocalizableKeys">Are the modifiers localizable keys too?</param>
+        /// <param name="valueModifiers">Modifiers to apply to the key, they will substitute "{number}" instances on the value.</param>
+        public string GetText(string key,
+                              int languageIndex,
+                              bool modifiersAreLocalizableKeys = true,
+                              params string[] valueModifiers)
         {
-            if (languagesLoaded) return languagePacks[languageIndex][key];
+            if (languagesLoaded)
+                return PostProcessRetrievedText(languagePacks[languageIndex][key],
+                                                modifiersAreLocalizableKeys,
+                                                valueModifiers);
 
             Logger.Error("The languages are not loaded yet!");
             return key;
+        }
+
+        /// <summary>
+        /// Post process the retrieved text with the list of modifiers
+        /// and the extra text postprocessors.
+        /// </summary>
+        /// <param name="text">Text to post process.</param>
+        /// <param name="modifiersAreLocalizableKeys">Are the modifiers also localizable keys?</param>
+        /// <param name="valueModifiers">Modifiers to apply to the key, they will substitute "{number}" instances on the value.</param>
+        /// <returns>The post processed text.</returns>
+        private string PostProcessRetrievedText(string text,
+                                                bool modifiersAreLocalizableKeys,
+                                                IReadOnlyList<string> valueModifiers)
+        {
+            if (valueModifiers != null)
+                for (int i = 0; i < valueModifiers.Count; i++)
+                {
+                    string modifier = valueModifiers[i];
+
+                    text = text.Replace("{" + i + "}", modifiersAreLocalizableKeys ? GetText(modifier) : modifier);
+                }
+
+            // TODO: Extra postprocessors.
+
+            return text;
         }
 
         /// <summary>

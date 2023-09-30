@@ -7,8 +7,7 @@ namespace WhateverDevs.Localization.Runtime
     /// <summary>
     /// Default holder implementation of the localizer configuration.
     /// </summary>
-    [CreateAssetMenu(menuName = "WhateverDevs/Localization/Configuration",
-                     fileName = "LocalizerConfiguration")]
+    [CreateAssetMenu(menuName = "WhateverDevs/Localization/UserConfiguration", fileName = "LocalizerConfiguration")]
     public class
         LocalizerConfigurationFile : LocalizerConfigurationFile<LocalizerConfiguration>
     {
@@ -25,13 +24,14 @@ namespace WhateverDevs.Localization.Runtime
     }
 
     /// <summary>
-    ///     LocalizerConfigurationData configuration data.
+    /// Class that stores the localization configuration.
     /// </summary>
     [Serializable]
     public class LocalizerConfiguration : ConfigurationData
     {
-        public string SelectedLanguage;
-
-        public string LanguagePackDirectory = "Languages/";
+        /// <summary>
+        /// Currently selected language.
+        /// </summary>
+        public string SelectedLanguage = "English";
     }
 }

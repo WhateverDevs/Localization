@@ -14,14 +14,19 @@ namespace WhateverDevs.Localization.Runtime
     public class Localizer : Loggable<Localizer>, ILocalizer
     {
         /// <summary>
-        /// Configuration
+        /// Configuration.
         /// </summary>
         private LocalizerConfiguration configuration;
 
         /// <summary>
-        /// List of all the languages
+        /// Project settings for the localizer.
         /// </summary>
-        private readonly List<LanguagePack> languagePacks = new();
+        private LocalizerSettings projectSettings;
+
+        /// <summary>
+        /// List of all the languages.
+        /// </summary>
+        private List<ScriptableLanguage> languagePacks;
 
         /// <summary>
         /// Flag to know
@@ -57,8 +62,9 @@ namespace WhateverDevs.Localization.Runtime
         /// Init.
         /// </summary>
         [Inject]
-        public void Construct(IConfigurationManager configurationManagerReference)
+        public void Construct(IConfigurationManager configurationManagerReference, LocalizerSettings settings)
         {
+            projectSettings = settings;
             configurationManager = configurationManagerReference;
 
             if (!configurationManager.GetConfiguration(out configuration))
@@ -68,7 +74,18 @@ namespace WhateverDevs.Localization.Runtime
 
             LoadValues();
 
-            SetLanguage(configuration.SelectedLanguage);
+            if (languagePacks.Count == 0)
+            {
+                Logger.Error("No languages found! Errors will follow.");
+
+                return;
+            }
+
+            SetLanguage(GetAllLanguageIds().Contains(configuration.SelectedLanguage)
+                            ? configuration.SelectedLanguage
+                            : languagePacks[0].name);
+
+            languagesLoaded = true;
         }
 
         /// <summary>
@@ -77,29 +94,13 @@ namespace WhateverDevs.Localization.Runtime
         private void LoadValues()
         {
             if (languagesLoaded) return;
-            string auxPath = configuration.LanguagePackDirectory;
+            string auxPath = projectSettings.LanguagePackDirectory;
 
-            ScriptableLanguage[] tempObject = Resources.LoadAll<ScriptableLanguage>(auxPath);
+            languagePacks = Resources.LoadAll<ScriptableLanguage>(auxPath).ToList();
 
-            for (int i = 0; i < tempObject.Length; ++i)
-            {
-                ScriptableLanguage tempScript = tempObject[i];
+            Logger.Info("Loaded " + languagePacks.Count + " languages:");
 
-                if (tempScript == null) continue;
-
-                LanguagePack temp = new LanguagePack { Language = tempScript.name };
-
-                for (int j = 0; j < tempScript.Language.Count; ++j)
-                {
-                    string key = tempScript.Language[j].Key;
-                    string value = tempScript.Language[j].Value;
-                    temp.AddNewString(key, value);
-                }
-
-                languagePacks.Add(temp);
-            }
-
-            languagesLoaded = true;
+            foreach (ScriptableLanguage language in languagePacks) Logger.Info("-->" + language.name);
         }
 
         /// <summary>
@@ -130,10 +131,10 @@ namespace WhateverDevs.Localization.Runtime
         /// <returns></returns>
         public string GetText(string key, int languageIndex)
         {
-            if (languagesLoaded) return languagePacks[languageIndex].GetString(key);
+            if (languagesLoaded) return languagePacks[languageIndex][key];
 
             Logger.Error("The languages are not loaded yet!");
-            return "The languages are not loaded yet!";
+            return key;
         }
 
         /// <summary>
@@ -177,13 +178,13 @@ namespace WhateverDevs.Localization.Runtime
         /// <param name="languageIndexes">Languages to retrieve them from.</param>
         /// <returns>A dictionary with the language as the key and a list of the localized texts as the value.</returns>
         public Dictionary<string, List<string>> GetTexts(List<string> keys, List<int> languageIndexes) =>
-            languageIndexes.ToDictionary(index => languagePacks[index].Language, index => GetTexts(keys, index));
+            languageIndexes.ToDictionary(index => languagePacks[index].name, index => GetTexts(keys, index));
 
         /// <summary>
         /// Get the current language key.
         /// </summary>
         /// <returns>A localizable string key for the name of the current language.</returns>
-        public string GetCurrentLanguage() => languagePacks[currentLanguage].Language;
+        public string GetCurrentLanguage() => languagePacks[currentLanguage].name;
 
         /// <summary>
         /// Get the current language index.
@@ -199,7 +200,7 @@ namespace WhateverDevs.Localization.Runtime
         public int GetLanguageIndex(string language)
         {
             for (int i = 0; i < languagePacks.Count; ++i)
-                if (languagePacks[i].Language == language)
+                if (languagePacks[i].name == language)
                     return i;
 
             Logger.Error("Language " + language + " does not exist!");
@@ -217,7 +218,7 @@ namespace WhateverDevs.Localization.Runtime
 
             languageIds = new List<string>();
 
-            for (int i = 0; i < languagePacks.Count; ++i) languageIds.Add(languagePacks[i].Language);
+            for (int i = 0; i < languagePacks.Count; ++i) languageIds.Add(languagePacks[i].name);
 
             return languageIds;
         }
@@ -230,7 +231,7 @@ namespace WhateverDevs.Localization.Runtime
         {
             for (int i = 0; i < languagePacks.Count; ++i)
             {
-                if (languagePacks[i].Language != language) continue;
+                if (languagePacks[i].name != language) continue;
                 SetLanguage(i);
                 return;
             }
@@ -246,7 +247,7 @@ namespace WhateverDevs.Localization.Runtime
         {
             currentLanguage = language;
 
-            configuration.SelectedLanguage = languagePacks[currentLanguage].Language;
+            configuration.SelectedLanguage = languagePacks[currentLanguage].name;
             if (!configurationManager.SetConfiguration(configuration)) Logger.Error("Error saving configuration!");
 
             languageChanged?.Invoke(GetCurrentLanguage());

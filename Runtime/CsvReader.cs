@@ -34,7 +34,6 @@ namespace WhateverDevs.Localization.Runtime
                 {
                     string value = values[j];
                     value = value.TrimStart(TrimChars).TrimEnd(TrimChars).Replace("\\", "");
-                    value = value.Replace("{LineBreak}", "\n");
                     entry[header[j]] = value;
                 }
 

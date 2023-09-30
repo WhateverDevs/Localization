@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using WhateverDevs.Core.Behaviours;
+using WhateverDevs.Localization.Runtime.TextPostProcessors;
 
 namespace WhateverDevs.Localization.Runtime
 {
@@ -21,5 +23,10 @@ namespace WhateverDevs.Localization.Runtime
         /// Google Sheets Url to download the languages from.
         /// </summary>
         public string GoogleSheetsDownloadUrl = "";
+
+        /// <summary>
+        /// List of text post processors to be used by the localizer.
+        /// </summary>
+        public List<LocalizedTextPostProcessor> TextPostProcessors;
     }
 }

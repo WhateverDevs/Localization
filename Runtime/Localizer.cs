@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
 using WhateverDevs.Core.Runtime.Configuration;
+using WhateverDevs.Localization.Runtime.TextPostProcessors;
 using Zenject;
 
 namespace WhateverDevs.Localization.Runtime
@@ -150,6 +151,8 @@ namespace WhateverDevs.Localization.Runtime
                               bool modifiersAreLocalizableKeys = true,
                               params string[] valueModifiers)
         {
+            if (key.IsNullEmptyOrWhiteSpace()) return key;
+
             if (languagesLoaded)
                 return PostProcessRetrievedText(languagePacks[languageIndex][key],
                                                 modifiersAreLocalizableKeys,
@@ -179,10 +182,21 @@ namespace WhateverDevs.Localization.Runtime
                     text = text.Replace("{" + i + "}", modifiersAreLocalizableKeys ? GetText(modifier) : modifier);
                 }
 
-            // TODO: Extra postprocessors.
+            object[] extraParams = PreparePostProcessorExtraParams();
+
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            foreach (LocalizedTextPostProcessor postProcessor in projectSettings.TextPostProcessors)
+                if (!postProcessor.PostProcessText(ref text, extraParams))
+                    Logger.Error("Error post processing \"" + text + "\" with " + postProcessor.name + ".");
 
             return text;
         }
+
+        /// <summary>
+        /// Prepare the extra params for the post processors.
+        /// This may be overriden per application.
+        /// </summary>
+        protected virtual object[] PreparePostProcessorExtraParams() => new object[] { };
 
         /// <summary>
         /// Get a list of localized texts in the current language for the given keys.

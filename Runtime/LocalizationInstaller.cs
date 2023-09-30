@@ -1,4 +1,5 @@
 using UnityEngine;
+using WhateverDevs.Localization.Runtime.TextPostProcessors;
 using Zenject;
 
 namespace WhateverDevs.Localization.Runtime
@@ -20,6 +21,9 @@ namespace WhateverDevs.Localization.Runtime
         /// </summary>
         public override void InstallBindings()
         {
+            foreach (LocalizedTextPostProcessor postProcessor in LocalizerProjectSettings.TextPostProcessors)
+                Container.QueueForInject(postProcessor);
+
             Container.Bind<LocalizerSettings>()
                      .FromInstance(LocalizerProjectSettings)
                      .AsSingle()

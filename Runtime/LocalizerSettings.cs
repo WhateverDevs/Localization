@@ -22,7 +22,8 @@ namespace WhateverDevs.Localization.Runtime
         /// <summary>
         /// Google Sheets Url to download the languages from.
         /// </summary>
-        public string GoogleSheetsDownloadUrl = "";
+        [Tooltip("Lower URLs will replace keys of the higher ones if they have the same key.")]
+        public List<string> GoogleSheetsDownloadUrls;
 
         /// <summary>
         /// List of text post processors to be used by the localizer.

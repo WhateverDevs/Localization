@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 using WhateverDevs.Core.Editor.Utils;
 using WhateverDevs.Localization.Runtime;
@@ -36,6 +37,11 @@ namespace WhateverDevs.Localization.Editor
         private bool deleteFileWhenFinished = true;
 
         /// <summary>
+        /// Reorderable list to display the scene list.
+        /// </summary>
+        private ReorderableList reorderableList;
+
+        /// <summary>
         /// Load the configs.
         /// </summary>
         private void OnEnable()
@@ -44,6 +50,7 @@ namespace WhateverDevs.Localization.Editor
             {
                 EditorUtility.DisplayProgressBar("Localization", "Looking for configuration...", .5f);
                 projectSettings = AssetManagementUtils.FindAssetsByType<LocalizerSettings>().First();
+                LoadListEditor();
             }
             finally
             {
@@ -72,24 +79,45 @@ namespace WhateverDevs.Localization.Editor
                                   + "If you have tabs inside your localization text you will fuck up!",
                                     MessageType.Warning);
 
-            EditorGUILayout.BeginHorizontal();
+            reorderableList.DoLayoutList();
 
-            {
-                projectSettings.GoogleSheetsDownloadUrl =
-                    EditorGUILayout.TextField("Url to file", projectSettings.GoogleSheetsDownloadUrl);
+            if (GUILayout.Button("Paste into new element"))
+                projectSettings.GoogleSheetsDownloadUrls.Add(EditorGUIUtility.systemCopyBuffer);
 
-                if (GUILayout.Button("Paste"))
-                    projectSettings.GoogleSheetsDownloadUrl = EditorGUIUtility.systemCopyBuffer;
-            }
-
-            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+            EditorGUILayout.Space();
 
             deleteFileWhenFinished = EditorGUILayout.Toggle("Delete file when finished", deleteFileWhenFinished);
 
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+            EditorGUILayout.Space();
+
             if (GUILayout.Button("Download and Parse"))
-                GoogleSheetLoader.LoadLanguages(projectSettings.GoogleSheetsDownloadUrl,
+                GoogleSheetLoader.LoadLanguages(projectSettings.GoogleSheetsDownloadUrls.ToArray(),
                                                 projectSettings.LanguagePackDirectory,
                                                 deleteFileWhenFinished);
         }
+
+        /// <summary>
+        /// Loads the editor for the Exercise List.
+        /// </summary>
+        private void LoadListEditor() =>
+            reorderableList =
+                new ReorderableList(projectSettings.GoogleSheetsDownloadUrls, typeof(SceneAsset))
+                {
+                    drawHeaderCallback = rect => EditorGUI.LabelField(rect, "URL list"),
+                    drawElementCallback = (rect, index, _, _) =>
+                                          {
+                                              projectSettings.GoogleSheetsDownloadUrls[index] =
+                                                  EditorGUI.TextField(rect,
+                                                                      projectSettings.GoogleSheetsDownloadUrls
+                                                                          [index]);
+
+                                              EditorUtility.SetDirty(projectSettings);
+                                          },
+                    onAddCallback = _ => projectSettings.GoogleSheetsDownloadUrls.Add(null)
+                };
     }
 }

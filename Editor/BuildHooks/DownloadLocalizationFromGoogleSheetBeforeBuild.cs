@@ -22,7 +22,7 @@ namespace WhateverDevs.Localization.Editor.BuildHooks
         /// </summary>
         public override bool RunHook(string buildPath)
         {
-            GoogleSheetLoader.LoadLanguages(LocalizationProjectSettings.GoogleSheetsDownloadUrl,
+            GoogleSheetLoader.LoadLanguages(LocalizationProjectSettings.GoogleSheetsDownloadUrls.ToArray(),
                                             LocalizationProjectSettings.LanguagePackDirectory);
 
             return true;

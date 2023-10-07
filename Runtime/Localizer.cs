@@ -101,7 +101,8 @@ namespace WhateverDevs.Localization.Runtime
 
             Logger.Info("Loaded " + languagePacks.Count + " languages:");
 
-            foreach (ScriptableLanguage language in languagePacks) Logger.Info("-->" + language.name);
+            foreach (ScriptableLanguage language in languagePacks)
+                Logger.Info("-->" + language.name + " - " + language.Language.Count + " keys.");
         }
 
         /// <summary>

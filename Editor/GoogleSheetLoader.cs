@@ -122,9 +122,11 @@ namespace WhateverDevs.Localization.Editor
                         }
 
                     EditorUtility.SetDirty(asset);
+                    AssetDatabase.SaveAssets();
+                    AssetDatabase.Refresh();
                 }
             }
-            
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }

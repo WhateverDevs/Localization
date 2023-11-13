@@ -66,7 +66,7 @@ namespace WhateverDevs.Localization.Runtime.Ui
         /// <summary>
         /// Unsubscribe from language change.
         /// </summary>
-        protected virtual void OnDisable() => Localizer.UnsubscribeFromLanguageChange(OnLanguageChanged);
+        protected virtual void OnDisable() => Localizer?.UnsubscribeFromLanguageChange(OnLanguageChanged);
 
         /// <summary>
         /// Set a new value and refresh.

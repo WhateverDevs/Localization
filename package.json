@@ -1,6 +1,6 @@
 {
   "name": "whateverdevs.localization",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "displayName": "Localization",
   "description": "Localization package for easily displaying text in different languages.",
   "dependencies": {

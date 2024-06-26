@@ -9,6 +9,17 @@ namespace WhateverDevs.Localization.Runtime
     public interface ILocalizer
     {
         /// <summary>
+        /// Load new languages to use.
+        /// </summary>
+        /// <param name="newLanguages">New languages to be loaded.</param>
+        void LoadNewLanguageValues(List<ScriptableLanguage> newLanguages);
+
+        /// <summary>
+        /// Retrieve the languages from the Google Sheet again.
+        /// </summary>
+        void ReDownloadLanguagesFromGoogleSheet();
+
+        /// <summary>
         /// Get the localized text in the current language for the given key.
         /// </summary>
         /// <param name="key">Key to retrieve.</param>

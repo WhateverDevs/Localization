@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
 using WhateverDevs.Core.Runtime.Configuration;
+using WhateverDevs.Core.Runtime.DataStructures.Integration;
 using WhateverDevs.Localization.Runtime.TextPostProcessors;
 using Zenject;
 
@@ -12,6 +14,7 @@ namespace WhateverDevs.Localization.Runtime
     /// <summary>
     /// Localizer class
     /// </summary>
+    [UsedImplicitly]
     public class Localizer : Loggable<Localizer>, ILocalizer
     {
         /// <summary>
@@ -73,7 +76,28 @@ namespace WhateverDevs.Localization.Runtime
 
             languageChanged += _ => languageChangedNoParam?.Invoke();
 
-            LoadValues();
+            if (!languagesLoaded) LoadValuesFromResources();
+        }
+
+        /// <summary>
+        /// Load all the languages from the scriptables objects
+        /// </summary>
+        private void LoadValuesFromResources() =>
+            LoadNewLanguageValues(Resources.LoadAll<ScriptableLanguage>(projectSettings.LanguagePackDirectory)
+                                           .ToList());
+
+        /// <summary>
+        /// Load new languages to use.
+        /// </summary>
+        /// <param name="newLanguages">New languages to be loaded.</param>
+        public void LoadNewLanguageValues(List<ScriptableLanguage> newLanguages)
+        {
+            languagePacks = newLanguages;
+
+            Logger.Info("Loaded " + languagePacks.Count + " languages:");
+
+            foreach (ScriptableLanguage language in languagePacks)
+                Logger.Info("-->" + language.name + " - " + language.Language.Count + " keys.");
 
             if (languagePacks.Count == 0)
             {
@@ -82,27 +106,74 @@ namespace WhateverDevs.Localization.Runtime
                 return;
             }
 
+            languagesLoaded = true;
+
             SetLanguage(GetAllLanguageIds().Contains(configuration.SelectedLanguage)
                             ? configuration.SelectedLanguage
                             : languagePacks[0].name);
-
-            languagesLoaded = true;
         }
 
         /// <summary>
-        /// Load all the languages from the scriptables objects
+        /// Retrieve the languages from the Google Sheet again.
+        /// This method is very similar to the one on GoogleSheetLoader
+        /// but it doesn't save the scriptable objects to the Resources folder since it's only used on runtime.
         /// </summary>
-        private void LoadValues()
+        public void ReDownloadLanguagesFromGoogleSheet()
         {
-            if (languagesLoaded) return;
-            string auxPath = projectSettings.LanguagePackDirectory;
+            languagesLoaded = false;
 
-            languagePacks = Resources.LoadAll<ScriptableLanguage>(auxPath).ToList();
+            List<ScriptableLanguage> newLanguages = new();
 
-            Logger.Info("Loaded " + languagePacks.Count + " languages:");
+            List<string> newTsvData = projectSettings.GoogleSheetsDownloadUrls
+                                                     .Select(url =>
+                                                                 DriveFileDownloader
+                                                                    .GetTextFromUrl(url.Replace("edit?usp=sharing",
+                                                                         "export?format=tsv")))
+                                                     .ToList();
 
-            foreach (ScriptableLanguage language in languagePacks)
-                Logger.Info("-->" + language.name + " - " + language.Language.Count + " keys.");
+            const string separator = "\t";
+
+            foreach (string languageSet in newTsvData)
+            {
+                List<Dictionary<string, string>> gameParametersData =
+                    CsvReader.ReadColumnsFromCsv(languageSet, separator);
+
+                List<string> languages =
+                    gameParametersData[0].Keys.Where(key => !key.IsNullEmptyOrWhiteSpace()).ToList();
+
+                string keyName = languages[0];
+
+                for (int i = 1; i < languages.Count; i++)
+                {
+                    string language = languages[i];
+
+                    ScriptableLanguage languageAsset =
+                        newLanguages.FirstOrDefault(asset => asset.name == language);
+
+                    if (languageAsset == null)
+                    {
+                        languageAsset = ScriptableObject.CreateInstance<ScriptableLanguage>();
+                        languageAsset.name = language;
+                    }
+
+                    foreach (Dictionary<string, string> dictionary in gameParametersData)
+                        if (dictionary.TryGetValue(keyName, out string key)
+                         && !key.IsNullEmptyOrWhiteSpace())
+                        {
+                            if (!dictionary.TryGetValue(language, out string value) || value.IsNullEmptyOrWhiteSpace())
+                            {
+                                StaticLogger.Error("Key " + key + " has no value in language " + language + "!");
+                                continue;
+                            }
+
+                            languageAsset.Language[key] = value;
+                        }
+
+                    newLanguages.AddIfNew(languageAsset);
+                }
+            }
+
+            LoadNewLanguageValues(newLanguages);
         }
 
         /// <summary>

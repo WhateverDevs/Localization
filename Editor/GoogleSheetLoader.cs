@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using WhateverDevs.Core.Runtime.Common;
+using WhateverDevs.Core.Runtime.DataStructures.Integration;
 using WhateverDevs.Localization.Runtime;
 
 namespace WhateverDevs.Localization.Editor
@@ -77,19 +78,17 @@ namespace WhateverDevs.Localization.Editor
 
             foreach (string languageSet in tsvData)
             {
-                List<Dictionary<string, string>> gameParametersData = CsvReader.Read(languageSet, Separator);
+                List<Dictionary<string, string>> gameParametersData =
+                    CsvReader.ReadColumnsFromCsv(languageSet, Separator);
 
                 List<string> languages =
                     gameParametersData[0].Keys.Where(key => !key.IsNullEmptyOrWhiteSpace()).ToList();
 
                 string keyName = languages[0];
 
-                for (int i = 0; i < languages.Count; i++)
+                for (int i = 1; i < languages.Count; i++)
                 {
                     string language = languages[i];
-
-                    // Key column.
-                    if (language == keyName) continue;
 
                     EditorUtility.DisplayProgressBar("Loading languages",
                                                      language,
